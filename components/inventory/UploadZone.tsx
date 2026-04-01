@@ -4,6 +4,7 @@ import type { ExtractedItem, PhotoAnalysis } from '@/lib/supabase/types'
 
 type UploadStep = 'idle' | 'uploading' | 'parsing' | 'reviewing' | 'error'
 
+
 interface UploadZoneProps {
   shopId: string
   onPdfExtracted: (items: ExtractedItem[], pdfUploadId: string) => void
@@ -26,6 +27,10 @@ export function UploadZone({ shopId, onPdfExtracted, onPhotoAnalyzed }: UploadZo
       const isPdf = file.type === 'application/pdf'
 
       if (isPdf) {
+        if (file.size > 50 * 1024 * 1024) {
+          throw new Error('PDF must be under 50MB.')
+        }
+
         // Phase 1: get a presigned URL, upload directly to Supabase (bypasses Vercel 4.5MB limit)
         const presignRes = await fetch('/api/upload/presign', {
           method: 'POST',
@@ -174,7 +179,7 @@ export function UploadZone({ shopId, onPdfExtracted, onPhotoAnalyzed }: UploadZo
           {dragOver ? 'Drop to upload' : 'Drag & drop or click to upload'}
         </p>
         <p className="text-sm text-[#8A8A84] mt-1">
-          PDF (up to 500MB) or Images (JPG, PNG, WEBP)
+          PDF (up to 50MB) or Images (JPG, PNG, WEBP)
         </p>
         <p className="text-xs text-[#8A8A84] mt-3 max-w-xs">
           PDFs are parsed by AI to extract all items automatically. Images are analyzed to suggest name, category, and era.

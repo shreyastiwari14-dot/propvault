@@ -8,7 +8,7 @@ const anthropic = new Anthropic({
 const MODEL = 'claude-sonnet-4-6'
 const FAST_MODEL = 'claude-haiku-4-5-20251001'
 
-export async function extractItemsFromPdf(pdfUrl: string): Promise<ExtractedItem[]> {
+export async function extractItemsFromPdf(pdfBase64: string): Promise<ExtractedItem[]> {
   const prompt = `Extract every prop/item from this PDF. Return a compact JSON array — one object per item, no omissions:
 [{"name":"","category":"Furniture|Lighting|Textiles|Kitchenware|Art & Decor|Vehicles|Wardrobe|Electronics|Architectural|Miscellaneous","era_style":null,"dimensions_raw":null,"dimensions_l":null,"dimensions_w":null,"dimensions_h":null,"quantity_total":1,"condition":"Excellent|Good|Fair|Poor|null","description":""}]
 Rules: category and condition must match the exact values shown. dimensions in cm. description max 20 words. Return ONLY the JSON array.`
@@ -20,8 +20,10 @@ Rules: category and condition must match the exact values shown. dimensions in c
       {
         role: 'user',
         content: [
-          // eslint-disable-next-line @typescript-eslint/no-explicit-any
-          { type: 'document', source: { type: 'url', url: pdfUrl } } as any,
+          {
+            type: 'document',
+            source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 },
+          },
           {
             type: 'text',
             text: prompt,
