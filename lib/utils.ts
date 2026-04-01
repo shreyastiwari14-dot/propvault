@@ -1,4 +1,4 @@
-import { type ItemCategory, type ShopStatus, type BookingStatus, type PaymentStatus } from './supabase/types'
+import { type ItemStatus, type BookingStatus, type PaymentStatus } from './supabase/types'
 
 export function formatDate(dateStr: string): string {
   const date = new Date(dateStr)
@@ -25,37 +25,25 @@ export function generateSlug(name: string): string {
     .trim()
 }
 
-export function getStatusConfig(status: ShopStatus | BookingStatus | PaymentStatus | string): {
-  label: string
-  bg: string
-  text: string
+export function getStatusConfig(status: ItemStatus | BookingStatus | PaymentStatus | string): {
+  label: string; bg: string; text: string
 } {
   const configs: Record<string, { label: string; bg: string; text: string }> = {
-    Available: { label: 'Available', bg: '#22C55E', text: '#14532D' },
-    Reserved: { label: 'Reserved', bg: '#F59E0B', text: '#451A03' },
-    Out: { label: 'Out', bg: '#EF4444', text: '#ffffff' },
-    Returned: { label: 'Returned', bg: '#3B82F6', text: '#ffffff' },
-    Requested: { label: 'Requested', bg: '#F59E0B', text: '#451A03' },
-    Confirmed: { label: 'Confirmed', bg: '#22C55E', text: '#14532D' },
-    Active: { label: 'Active', bg: '#EF4444', text: '#ffffff' },
-    Cancelled: { label: 'Cancelled', bg: '#8A8A84', text: '#ffffff' },
-    Pending: { label: 'Pending', bg: '#D4501A', text: '#ffffff' },
-    Partial: { label: 'Partial', bg: '#F59E0B', text: '#451A03' },
-    Cleared: { label: 'Cleared', bg: '#22C55E', text: '#14532D' },
-    Processing: { label: 'Processing', bg: '#F59E0B', text: '#451A03' },
-    Parsed: { label: 'Parsed', bg: '#22C55E', text: '#14532D' },
-    Failed: { label: 'Failed', bg: '#EF4444', text: '#ffffff' },
-    'Payment Due': { label: 'Payment Due', bg: '#D4501A', text: '#ffffff' },
+    available:   { label: 'Available',   bg: '#22C55E', text: '#14532D' },
+    booked:      { label: 'Booked',      bg: '#EF4444', text: '#ffffff' },
+    maintenance: { label: 'Maintenance', bg: '#EAB308', text: '#ffffff' },
+    unavailable: { label: 'Unavailable', bg: '#8888A0', text: '#ffffff' },
+    pending:     { label: 'Pending',     bg: '#EAB308', text: '#451A03' },
+    confirmed:   { label: 'Confirmed',   bg: '#3B82F6', text: '#ffffff' },
+    active:      { label: 'Active',      bg: '#22C55E', text: '#14532D' },
+    returned:    { label: 'Returned',    bg: '#8888A0', text: '#ffffff' },
+    cancelled:   { label: 'Cancelled',   bg: '#8888A0', text: '#ffffff' },
+    paid:        { label: 'Paid',        bg: '#22C55E', text: '#14532D' },
+    overdue:     { label: 'Overdue',     bg: '#EF4444', text: '#ffffff' },
+    partial:     { label: 'Partial',     bg: '#EAB308', text: '#451A03' },
   }
-  return configs[status] || { label: status, bg: '#8A8A84', text: '#ffffff' }
+  return configs[status] ?? { label: status, bg: '#8888A0', text: '#ffffff' }
 }
-
-export const CATEGORIES: ItemCategory[] = [
-  'Furniture', 'Lighting', 'Textiles', 'Kitchenware', 'Art & Decor',
-  'Vehicles', 'Wardrobe', 'Electronics', 'Architectural', 'Miscellaneous'
-]
-
-export const CONDITIONS = ['Excellent', 'Good', 'Fair', 'Poor'] as const
 
 export function isOverdue(dueDateStr: string | null): boolean {
   if (!dueDateStr) return false

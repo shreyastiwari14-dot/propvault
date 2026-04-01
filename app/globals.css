@@ -1,18 +1,19 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors */
-  --color-surface: #F7F6F3;
-  --color-primary: #111110;
-  --color-muted: #8A8A84;
-  --color-border: #E5E3DE;
-  --color-accent: #D4501A;
-  --color-accent-hover: #B8431A;
-  --color-status-available: #22C55E;
-  --color-status-reserved: #F59E0B;
-  --color-status-out: #EF4444;
-  --color-status-returned: #3B82F6;
-  --color-white: #FFFFFF;
+  /* KGN Dark Theme */
+  --color-bg-primary: #0A0A0F;
+  --color-bg-secondary: #111118;
+  --color-bg-tertiary: #1A1A24;
+  --color-border: #2A2A3A;
+  --color-text-primary: #F0F0F5;
+  --color-text-secondary: #8888A0;
+  --color-accent: #E94560;
+  --color-accent-hover: #C73350;
+  --color-success: #22C55E;
+  --color-warning: #EAB308;
+  --color-danger: #EF4444;
+  --color-info: #3B82F6;
 
   /* Typography */
   --font-sans: var(--font-dm-sans, "DM Sans"), sans-serif;
@@ -76,19 +77,10 @@
   --radius-full: 9999px;
 
   /* Shadows */
-  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
-  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
-  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
-  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
-
-  /* Z-index */
-  --z-index-0: 0;
-  --z-index-10: 10;
-  --z-index-20: 20;
-  --z-index-30: 30;
-  --z-index-40: 40;
-  --z-index-50: 50;
-  --z-index-auto: auto;
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.3);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.4), 0 2px 4px -2px rgb(0 0 0 / 0.3);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.5), 0 4px 6px -4px rgb(0 0 0 / 0.3);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.6), 0 8px 10px -6px rgb(0 0 0 / 0.4);
 }
 
 /* Base styles */
@@ -105,8 +97,8 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background-color: var(--color-surface);
-  color: var(--color-primary);
+  background-color: #0A0A0F;
+  color: #F0F0F5;
   line-height: 1.5;
   margin: 0;
   padding: 0;
@@ -125,27 +117,27 @@ body {
 }
 
 ::-webkit-scrollbar-thumb {
-  background-color: var(--color-border);
-  border-radius: var(--radius-full);
+  background-color: #2A2A3A;
+  border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background-color: var(--color-muted);
+  background-color: #8888A0;
 }
 
 * {
   scrollbar-width: thin;
-  scrollbar-color: var(--color-border) transparent;
+  scrollbar-color: #2A2A3A transparent;
 }
 
 /* Focus styles */
 :focus-visible {
-  outline: 2px solid var(--color-accent);
+  outline: 2px solid #E94560;
   outline-offset: 2px;
 }
 
 /* Selection */
 ::selection {
-  background-color: var(--color-accent);
-  color: var(--color-white);
+  background-color: #E94560;
+  color: #F0F0F5;
 }

@@ -16,14 +16,14 @@ const ibmPlexMono = IBM_Plex_Mono({
 })
 
 export const metadata: Metadata = {
-  title: 'PropVault — Film Prop Management',
-  description: 'Prop shop management and catalogue platform for the Indian film industry',
+  title: 'KGN Ceramica Furniture — Props for Film & Production',
+  description: 'Browse and book film production props. Sofas, chairs, tables, mirrors, racks and more.',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${ibmPlexMono.variable}`}>
-      <body className="font-sans bg-[#F7F6F3] text-[#111110] antialiased">
+      <body className="font-sans bg-[#0A0A0F] text-[#F0F0F5] antialiased">
         {children}
       </body>
     </html>

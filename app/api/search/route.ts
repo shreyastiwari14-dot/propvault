@@ -1,25 +1,24 @@
 import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@/lib/supabase/server'
-import { searchItems } from '@/lib/claude'
 
-export async function POST(request: NextRequest) {
+export async function GET(request: NextRequest) {
+  const q = request.nextUrl.searchParams.get('q')?.trim()
+  if (!q || q.length < 2) return NextResponse.json({ items: [] })
+
+  // Escape SQL wildcards in user input
+  const escaped = q.replace(/[%_\\]/g, c => `\\${c}`)
+  const pattern = `%${escaped}%`
+
   try {
-    const { query, shop_id } = await request.json()
-    if (!query || !shop_id) return NextResponse.json({ error: 'Missing query or shop_id' }, { status: 400 })
+    const supabase = createClient()
+    const { data, error } = await supabase
+      .from('items')
+      .select('id, item_code, name, material, color, status, category:categories(slug, name)')
+      .or(`name.ilike.${pattern},item_code.ilike.${pattern},material.ilike.${pattern},color.ilike.${pattern}`)
+      .limit(30)
 
-    const supabase = await createClient()
-    const { data: items, error } = await supabase.from('items').select('id, name, category, era_style, description').eq('shop_id', shop_id)
     if (error) return NextResponse.json({ error: error.message }, { status: 500 })
-    if (!items?.length) return NextResponse.json({ ids: [] })
-
-    let ids: string[]
-    try {
-      ids = await searchItems(items, query)
-    } catch {
-      const q = query.toLowerCase()
-      ids = items.filter(i => i.name.toLowerCase().includes(q) || i.category.toLowerCase().includes(q) || (i.era_style ?? '').toLowerCase().includes(q) || (i.description ?? '').toLowerCase().includes(q)).map(i => i.id)
-    }
-    return NextResponse.json({ ids })
+    return NextResponse.json({ items: data ?? [] })
   } catch (e) {
     console.error('Search error:', e)
     return NextResponse.json({ error: 'Internal server error' }, { status: 500 })
