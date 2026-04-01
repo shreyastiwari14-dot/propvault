@@ -22,30 +22,47 @@ export function UploadZone({ shopId, onPdfExtracted, onPhotoAnalyzed }: UploadZo
     setError('')
     setStep('uploading')
 
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('shop_id', shopId)
-
     try {
       const isPdf = file.type === 'application/pdf'
-      const endpoint = isPdf ? '/api/upload/pdf' : '/api/upload/photo'
-
-      setStep('parsing')
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 58000)
-      const res = await fetch(endpoint, { method: 'POST', body: formData, signal: controller.signal }).finally(() => clearTimeout(timer))
-
-      if (!res.ok) {
-        const data = await res.json()
-        throw new Error(data.error || 'Upload failed')
-      }
-
-      const data = await res.json()
-      setStep('reviewing')
 
       if (isPdf) {
+        // Phase 1: get a presigned URL, upload directly to Supabase (bypasses Vercel 4.5MB limit)
+        const presignRes = await fetch('/api/upload/presign', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ shop_id: shopId, filename: file.name }),
+        })
+        if (!presignRes.ok) throw new Error((await presignRes.json()).error || 'Presign failed')
+        const { signed_url, storage_path, pdf_upload_id } = await presignRes.json()
+
+        // Upload directly to Supabase storage — no Vercel in the path
+        const uploadRes = await fetch(signed_url, { method: 'PUT', body: file, headers: { 'Content-Type': 'application/pdf' } })
+        if (!uploadRes.ok) throw new Error('Storage upload failed')
+
+        // Phase 2: ask the API to process from storage
+        setStep('parsing')
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), 58000)
+        const processRes = await fetch('/api/upload/pdf', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ storage_path, pdf_upload_id }),
+          signal: controller.signal,
+        }).finally(() => clearTimeout(timer))
+
+        if (!processRes.ok) throw new Error((await processRes.json()).error || 'Processing failed')
+        const data = await processRes.json()
+        setStep('reviewing')
         onPdfExtracted(data.items, data.pdf_upload_id)
       } else {
+        // Photos: small enough to go through Vercel directly
+        setStep('parsing')
+        const formData = new FormData()
+        formData.append('file', file)
+        const res = await fetch('/api/upload/photo', { method: 'POST', body: formData })
+        if (!res.ok) throw new Error((await res.json()).error || 'Upload failed')
+        const data = await res.json()
+        setStep('reviewing')
         onPhotoAnalyzed(data.analysis, file)
       }
     } catch (err: unknown) {
