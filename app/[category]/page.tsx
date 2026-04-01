@@ -13,7 +13,7 @@ export async function generateMetadata({ params }: Props) {
   const { data: cat } = await supabase.from('categories').select('name, item_count').eq('slug', slug).single()
   if (!cat) return { title: 'Not Found' }
   return {
-    title: `${cat.name} — KGN Ceramica Furniture`,
+    title: `${cat.name} — KGN Furniture and Props`,
     description: `Browse ${cat.item_count} ${cat.name.toLowerCase()} props for film & production.`,
   }
 }
@@ -36,7 +36,6 @@ export default async function CategoryPage({ params }: Props) {
     .eq('category_id', category.id)
     .order('item_code')
 
-  // Attach primary image url to each item
   const items = (rawItems ?? []).map(item => {
     const images = (item.item_images ?? []) as { image_url: string; is_primary: boolean; display_order: number }[]
     const primary = images.find(i => i.is_primary) ?? images.sort((a, b) => a.display_order - b.display_order)[0]
@@ -54,31 +53,52 @@ export default async function CategoryPage({ params }: Props) {
       quantity_available: item.quantity_available,
       quantity_total: item.quantity_total,
       primary_image_url: primary?.image_url ?? null,
+      category_slug: slug,
     }
   })
 
+  const availableCount = items.filter(i => i.status === 'available').length
+
   return (
     <div className="min-h-screen bg-[#0A0A0F]">
-      {/* Top nav */}
-      <div className="border-b border-[#2A2A3A] bg-[#111118]">
-        <div className="px-4 sm:px-6 py-3 max-w-7xl mx-auto flex items-center gap-2 text-sm">
-          <Link href="/" className="text-[#8888A0] hover:text-[#F0F0F5] transition-colors font-mono text-xs">
+      {/* Breadcrumb nav */}
+      <nav className="border-b border-[#1A1A2A] bg-[#0D0D14]">
+        <div className="px-6 sm:px-10 py-4 max-w-7xl mx-auto flex items-center gap-2">
+          <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors uppercase tracking-[0.15em]">
             KGN
           </Link>
-          <span className="text-[#2A2A3A]">/</span>
-          <span className="text-[#F0F0F5] font-mono text-xs">{category.name}</span>
+          <span className="text-[#1A1A2A] font-mono">/</span>
+          <span className="font-mono text-xs text-[#D0D0E0]">{category.name}</span>
+        </div>
+      </nav>
+
+      {/* Category header */}
+      <div className="px-6 sm:px-10 pt-12 pb-10 max-w-7xl mx-auto border-b border-[#1A1A2A]">
+        <div className="flex items-end justify-between gap-6">
+          <div>
+            <p className="font-mono text-[10px] text-[#E94560] uppercase tracking-[0.25em] mb-3">Category</p>
+            <h1 className="font-display text-[clamp(36px,6vw,80px)] font-light text-[#F0F0F5] leading-tight italic">
+              {category.name}
+            </h1>
+          </div>
+          <div className="text-right shrink-0 pb-2">
+            <div className="font-display text-4xl font-light text-[#1E1E2E]">{category.item_count ?? items.length}</div>
+            <div className="font-mono text-[10px] text-[#333348] uppercase tracking-[0.2em]">Total Props</div>
+            <div className="font-mono text-[10px] text-green-600 mt-1">{availableCount} available</div>
+          </div>
         </div>
       </div>
 
-      <div className="px-4 sm:px-6 py-8 max-w-7xl mx-auto">
-        {/* Page header */}
-        <div className="mb-8">
-          <h1 className="text-2xl sm:text-3xl font-bold text-[#F0F0F5]">{category.name}</h1>
-          <p className="text-[#8888A0] font-mono text-sm mt-1">{category.item_count ?? items.length} items</p>
-        </div>
+      <div className="px-6 sm:px-10 py-10 max-w-7xl mx-auto">
+        <CategoryClient items={items} categorySlug={slug} categoryName={category.name} />
+      </div>
 
-        {/* Client component handles filters + grid */}
-        <CategoryClient items={items} categorySlug={slug} />
+      {/* Footer */}
+      <div className="border-t border-[#1A1A2A] px-6 sm:px-10 py-5 max-w-7xl mx-auto flex items-center justify-between">
+        <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#8888A0] transition-colors">
+          ← Back to All Categories
+        </Link>
+        <span className="font-mono text-xs text-[#333348]">{category.name} · KGN</span>
       </div>
     </div>
   )

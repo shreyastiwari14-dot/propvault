@@ -384,11 +384,198 @@ function PaymentsTab({ payments, bookings, onUpdate }: { payments: Payment[]; bo
   )
 }
 
+// ─── Add Prop Tab ─────────────────────────────────────────────────────────────
+function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
+  const [categories, setCategories] = useState<{ id: string; name: string; slug: string }[]>([])
+  const [form, setForm] = useState({
+    category_id: '', item_code: '', name: '', material: '', color: '',
+    height: '', width: '', depth: '', length: '', description: '', style: '',
+    status: 'available', quantity_available: '1', quantity_total: '1',
+  })
+  const [imageFile, setImageFile] = useState<File | null>(null)
+  const [imagePreview, setImagePreview] = useState<string | null>(null)
+  const [saving, setSaving] = useState(false)
+  const [result, setResult] = useState<{ code: string } | null>(null)
+  const [error, setError] = useState('')
+
+  useEffect(() => {
+    fetch('/api/search?q=_categories').then(r => r.json()).catch(() => {})
+    // Fetch categories directly
+    fetch('/api/admin/categories').then(r => r.json()).then(d => setCategories(d.categories ?? [])).catch(() => {})
+  }, [])
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>) => {
+    setForm(prev => ({ ...prev, [e.target.name]: e.target.value }))
+  }
+
+  const handleImage = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0] ?? null
+    setImageFile(file)
+    if (file) setImagePreview(URL.createObjectURL(file))
+    else setImagePreview(null)
+  }
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault()
+    if (!form.category_id || !form.item_code || !form.name) {
+      setError('Category, item code, and name are required.')
+      return
+    }
+    setSaving(true); setError('')
+
+    let image_url: string | null = null
+    if (imageFile) {
+      const fd = new FormData()
+      fd.append('file', imageFile)
+      fd.append('item_code', form.item_code.toUpperCase())
+      const res = await fetch('/api/admin/upload-image', { method: 'POST', body: fd })
+      const data = await res.json()
+      if (!res.ok) { setError(data.error ?? 'Image upload failed'); setSaving(false); return }
+      image_url = data.url
+    }
+
+    const res = await fetch('/api/admin/items', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ ...form, image_url }),
+    })
+    const data = await res.json()
+    if (!res.ok) { setError(data.error ?? 'Failed to save prop'); setSaving(false); return }
+
+    setResult({ code: data.item?.item_code })
+    setSaving(false)
+    setForm({ category_id: '', item_code: '', name: '', material: '', color: '', height: '', width: '', depth: '', length: '', description: '', style: '', status: 'available', quantity_available: '1', quantity_total: '1' })
+    setImageFile(null); setImagePreview(null)
+    onSuccess()
+  }
+
+  const inputCls = "w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-sm text-[#F0F0F5] font-mono focus:outline-none focus:border-[#E94560] transition-colors placeholder-[#555568]"
+
+  return (
+    <div className="max-w-2xl">
+      {result && (
+        <div className="mb-6 bg-green-500/10 border border-green-500/30 rounded-lg px-4 py-3 flex items-center justify-between">
+          <p className="text-green-400 text-sm font-mono">✓ Prop <strong>{result.code}</strong> added successfully</p>
+          <button onClick={() => setResult(null)} className="text-green-400/60 hover:text-green-400 text-xs font-mono">Dismiss</button>
+        </div>
+      )}
+
+      <form onSubmit={handleSubmit} className="space-y-6">
+        {/* Category + Code */}
+        <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
+          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Identity</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Category *</label>
+              <select name="category_id" value={form.category_id} onChange={handleChange} required className={inputCls}>
+                <option value="">Select category…</option>
+                {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Item Code * (e.g. CH-105)</label>
+              <input name="item_code" value={form.item_code} onChange={handleChange} placeholder="CH-105" required className={inputCls} />
+            </div>
+          </div>
+          <div>
+            <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Name *</label>
+            <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Tufted Wingback Armchair" required className={inputCls} />
+          </div>
+          <div>
+            <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Description</label>
+            <textarea name="description" value={form.description} onChange={handleChange} placeholder="Short description (optional)" rows={2} className={`${inputCls} resize-none`} />
+          </div>
+        </div>
+
+        {/* Details */}
+        <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
+          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Details</h3>
+          <div className="grid grid-cols-2 gap-3">
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Material</label>
+              <input name="material" value={form.material} onChange={handleChange} placeholder="e.g. Teak Wood" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Color</label>
+              <input name="color" value={form.color} onChange={handleChange} placeholder="e.g. Dark Brown" className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Height</label>
+              <input name="height" value={form.height} onChange={handleChange} placeholder='e.g. 36"' className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Width</label>
+              <input name="width" value={form.width} onChange={handleChange} placeholder='e.g. 24"' className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Depth / Length</label>
+              <input name="depth" value={form.depth} onChange={handleChange} placeholder='e.g. 20"' className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Style</label>
+              <input name="style" value={form.style} onChange={handleChange} placeholder="e.g. Victorian" className={inputCls} />
+            </div>
+          </div>
+        </div>
+
+        {/* Inventory */}
+        <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
+          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Inventory</h3>
+          <div className="grid grid-cols-3 gap-3">
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Status</label>
+              <select name="status" value={form.status} onChange={handleChange} className={inputCls}>
+                {['available', 'booked', 'maintenance', 'unavailable'].map(s => <option key={s} value={s}>{s}</option>)}
+              </select>
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Available Qty</label>
+              <input name="quantity_available" type="number" min="0" value={form.quantity_available} onChange={handleChange} className={inputCls} />
+            </div>
+            <div>
+              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Total Qty</label>
+              <input name="quantity_total" type="number" min="1" value={form.quantity_total} onChange={handleChange} className={inputCls} />
+            </div>
+          </div>
+        </div>
+
+        {/* Image Upload */}
+        <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-3">
+          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Image</h3>
+          <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#2A2A3A] hover:border-[#E94560] rounded-lg p-6 cursor-pointer transition-colors">
+            {imagePreview ? (
+              // eslint-disable-next-line @next/next/no-img-element
+              <img src={imagePreview} alt="preview" className="max-h-40 object-contain rounded" />
+            ) : (
+              <>
+                <svg width="24" height="24" fill="none" stroke="currentColor" strokeWidth="1.5" viewBox="0 0 24 24" className="text-[#555568] mb-2">
+                  <path d="M4 16l4.586-4.586a2 2 0 0 1 2.828 0L16 16m-2-2 1.586-1.586a2 2 0 0 1 2.828 0L20 14m-6-6h.01M6 20h12a2 2 0 0 0 2-2V6a2 2 0 0 0-2-2H6a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2z"/>
+                </svg>
+                <span className="text-xs font-mono text-[#555568]">Click to upload image (JPG, PNG, WebP)</span>
+              </>
+            )}
+            <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
+          </label>
+          {imageFile && (
+            <button type="button" onClick={() => { setImageFile(null); setImagePreview(null) }} className="text-xs font-mono text-[#E94560]">Remove image</button>
+          )}
+        </div>
+
+        {error && <p className="text-xs text-red-400 font-mono">{error}</p>}
+
+        <button type="submit" disabled={saving} className="w-full bg-[#E94560] hover:bg-[#C73350] disabled:opacity-50 text-white font-medium py-3 rounded-lg text-sm transition-colors">
+          {saving ? 'Adding Prop…' : 'Add Prop to Catalogue'}
+        </button>
+      </form>
+    </div>
+  )
+}
+
 // ─── Main Admin Page ──────────────────────────────────────────────────────────
 export default function AdminPage() {
   const [authed, setAuthed] = useState(false)
   const [checking, setChecking] = useState(true)
-  const [tab, setTab] = useState<'dashboard' | 'bookings' | 'inventory' | 'payments'>('dashboard')
+  const [tab, setTab] = useState<'dashboard' | 'bookings' | 'inventory' | 'payments' | 'add'>('dashboard')
   const [bookings, setBookings] = useState<Booking[]>([])
   const [payments, setPayments] = useState<Payment[]>([])
   const [loading, setLoading] = useState(false)
@@ -421,6 +608,7 @@ export default function AdminPage() {
     { id: 'bookings', label: 'Bookings' },
     { id: 'inventory', label: 'Inventory' },
     { id: 'payments', label: 'Payments' },
+    { id: 'add', label: '+ Add Prop' },
   ] as const
 
   return (
@@ -428,9 +616,9 @@ export default function AdminPage() {
       {/* Header */}
       <div className="border-b border-[#2A2A3A] bg-[#111118]">
         <div className="px-4 sm:px-6 py-3 max-w-7xl mx-auto flex items-center justify-between">
-          <div className="flex items-center gap-4">
+          <div className="flex items-center gap-4 flex-wrap">
             <span className="font-bold text-[#F0F0F5] text-sm">KGN Admin</span>
-            <nav className="flex gap-1">
+            <nav className="flex gap-1 flex-wrap">
               {tabs.map(t => (
                 <button
                   key={t.id}
@@ -438,6 +626,8 @@ export default function AdminPage() {
                   className={`px-3 py-1.5 rounded text-xs font-mono transition-colors ${
                     tab === t.id
                       ? 'bg-[#1A1A24] text-[#F0F0F5]'
+                      : t.id === 'add'
+                      ? 'text-[#E94560] hover:text-[#F0F0F5]'
                       : 'text-[#8888A0] hover:text-[#F0F0F5]'
                   }`}
                 >
@@ -460,6 +650,7 @@ export default function AdminPage() {
         {tab === 'bookings' && <BookingsTab bookings={bookings} onUpdate={fetchData} />}
         {tab === 'inventory' && <InventoryTab onRefresh={fetchData} />}
         {tab === 'payments' && <PaymentsTab payments={payments} bookings={bookings} onUpdate={fetchData} />}
+        {tab === 'add' && <AddPropTab onSuccess={fetchData} />}
       </div>
     </div>
   )

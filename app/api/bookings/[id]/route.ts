@@ -21,21 +21,46 @@ export async function PATCH(request: NextRequest, { params }: { params: Promise<
 
     if (fe || !booking) return NextResponse.json({ error: 'Booking not found' }, { status: 404 })
 
-    // When going active → decrement availability
-    if (status === 'active' && booking.status === 'confirmed') {
-      const qty = Math.max(0, (booking.item?.quantity_available ?? 0) - booking.quantity)
+    const itemQtyAvail: number = booking.item?.quantity_available ?? 0
+    const itemQtyTotal: number = booking.item?.quantity_total ?? 1
+    const bookingQty: number = booking.quantity ?? 1
+    const prev = booking.status
+
+    // ── Live Inventory Transitions ────────────────────────────────────────────
+    // pending → confirmed: reserve stock
+    if (status === 'confirmed' && prev === 'pending') {
+      const newQty = Math.max(0, itemQtyAvail - bookingQty)
       await supabase
         .from('items')
-        .update({ quantity_available: qty, status: qty === 0 ? 'booked' : 'available' })
+        .update({ quantity_available: newQty, status: newQty === 0 ? 'booked' : 'available' })
         .eq('id', booking.item_id)
     }
 
-    // When returned → restore availability
-    if (status === 'returned' && booking.status === 'active') {
-      const qty = Math.min(booking.item?.quantity_total ?? 1, (booking.item?.quantity_available ?? 0) + booking.quantity)
+    // confirmed → cancelled: restore stock
+    if (status === 'cancelled' && prev === 'confirmed') {
+      const newQty = Math.min(itemQtyTotal, itemQtyAvail + bookingQty)
       await supabase
         .from('items')
-        .update({ quantity_available: qty, status: 'available' })
+        .update({ quantity_available: newQty, status: 'available' })
+        .eq('id', booking.item_id)
+    }
+
+    // confirmed → active: already deducted at confirmed; no-op
+    // active → returned: restore stock
+    if (status === 'returned' && prev === 'active') {
+      const newQty = Math.min(itemQtyTotal, itemQtyAvail + bookingQty)
+      await supabase
+        .from('items')
+        .update({ quantity_available: newQty, status: 'available' })
+        .eq('id', booking.item_id)
+    }
+
+    // active → cancelled: restore stock
+    if (status === 'cancelled' && prev === 'active') {
+      const newQty = Math.min(itemQtyTotal, itemQtyAvail + bookingQty)
+      await supabase
+        .from('items')
+        .update({ quantity_available: newQty, status: 'available' })
         .eq('id', booking.item_id)
     }
 

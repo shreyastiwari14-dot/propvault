@@ -19,13 +19,57 @@ export async function GET() {
 export async function POST(request: NextRequest) {
   try {
     const body = await request.json()
-    const { item_id, booker_name, booker_phone, booker_email, production_name, booking_date, return_date, quantity, notes } = body
+    const { booker_name, booker_phone, booker_email, production_name, booking_date, return_date, notes } = body
 
-    if (!item_id || !booker_name || !booker_phone || !booking_date) {
-      return NextResponse.json({ error: 'Missing required fields: item_id, booker_name, booker_phone, booking_date' }, { status: 400 })
+    if (!booker_name || !booker_phone || !booking_date) {
+      return NextResponse.json({ error: 'Missing required fields: booker_name, booker_phone, booking_date' }, { status: 400 })
     }
 
     const supabase = createServiceClient()
+
+    // ── Multi-item booking (cart) ─────────────────────────────────────────────
+    if (Array.isArray(body.items) && body.items.length > 0) {
+      const groupRef = `GRP-${Date.now()}-${Math.random().toString(36).slice(2, 6).toUpperCase()}`
+      const bookings = []
+
+      for (const cartItem of body.items as { item_id: string; item_code: string; quantity: number }[]) {
+        const { data: item } = await supabase
+          .from('items')
+          .select('quantity_available, name, item_code')
+          .eq('id', cartItem.item_id)
+          .single()
+
+        if (!item) {
+          return NextResponse.json({ error: `Item not found: ${cartItem.item_code}` }, { status: 404 })
+        }
+        if (item.quantity_available < (cartItem.quantity || 1)) {
+          return NextResponse.json({ error: `Only ${item.quantity_available} unit(s) available for ${cartItem.item_code}` }, { status: 400 })
+        }
+
+        bookings.push({
+          item_id: cartItem.item_id,
+          booker_name,
+          booker_phone,
+          booker_email: booker_email || null,
+          production_name: production_name || null,
+          booking_date,
+          return_date: return_date || null,
+          quantity: cartItem.quantity || 1,
+          notes: notes ? `[${groupRef}] ${notes}` : `[${groupRef}]`,
+          status: 'pending',
+        })
+      }
+
+      const { data, error } = await supabase.from('bookings').insert(bookings).select()
+      if (error) return NextResponse.json({ error: error.message }, { status: 500 })
+      return NextResponse.json({ bookings: data, group_ref: groupRef }, { status: 201 })
+    }
+
+    // ── Single-item booking (legacy) ──────────────────────────────────────────
+    const { item_id, quantity } = body
+    if (!item_id) {
+      return NextResponse.json({ error: 'Missing item_id or items array' }, { status: 400 })
+    }
 
     const { data: item } = await supabase
       .from('items')
