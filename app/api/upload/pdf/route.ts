@@ -2,7 +2,7 @@ import { NextRequest, NextResponse } from 'next/server'
 import { createClient } from '@supabase/supabase-js'
 import { extractItemsFromPdf } from '@/lib/claude'
 
-export const maxDuration = 120
+export const maxDuration = 60
 
 // Direct admin client — bypasses RLS for storage and DB operations
 function adminClient() {
@@ -21,6 +21,7 @@ export async function POST(request: NextRequest) {
 
     if (!file || !shopId) return NextResponse.json({ error: 'Missing file or shop_id' }, { status: 400 })
     if (file.type !== 'application/pdf') return NextResponse.json({ error: 'File must be a PDF' }, { status: 400 })
+    if (file.size > 10 * 1024 * 1024) return NextResponse.json({ error: 'PDF must be under 10MB. Try compressing it first.' }, { status: 400 })
 
     const supabase = adminClient()
     const arrayBuffer = await file.arrayBuffer()

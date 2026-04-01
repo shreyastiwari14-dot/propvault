@@ -6,6 +6,7 @@ const anthropic = new Anthropic({
 })
 
 const MODEL = 'claude-sonnet-4-6'
+const FAST_MODEL = 'claude-haiku-4-5-20251001'
 
 export async function extractItemsFromPdf(pdfBase64: string): Promise<ExtractedItem[]> {
   const prompt = `Extract every prop/item from this PDF. Return a compact JSON array — one object per item, no omissions:
@@ -13,7 +14,7 @@ export async function extractItemsFromPdf(pdfBase64: string): Promise<ExtractedI
 Rules: category and condition must match the exact values shown. dimensions in cm. description max 20 words. Return ONLY the JSON array.`
 
   const response = await anthropic.messages.create({
-    model: MODEL,
+    model: FAST_MODEL,
     max_tokens: 8096,
     messages: [
       {

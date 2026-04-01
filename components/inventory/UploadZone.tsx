@@ -32,7 +32,7 @@ export function UploadZone({ shopId, onPdfExtracted, onPhotoAnalyzed }: UploadZo
 
       setStep('parsing')
       const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), 120000)
+      const timer = setTimeout(() => controller.abort(), 58000)
       const res = await fetch(endpoint, { method: 'POST', body: formData, signal: controller.signal }).finally(() => clearTimeout(timer))
 
       if (!res.ok) {
