@@ -30,9 +30,10 @@ export async function POST(request: NextRequest) {
       await supabase.from('pdf_uploads').update({ status: 'Parsed', items_extracted: items.length }).eq('id', pdf_upload_id)
       return NextResponse.json({ pdf_upload_id, items, count: items.length })
     } catch (e) {
-      console.error('Claude extraction error:', e)
+      const msg = e instanceof Error ? e.message : String(e)
+      console.error('Claude extraction error:', msg)
       await supabase.from('pdf_uploads').update({ status: 'Failed' }).eq('id', pdf_upload_id)
-      return NextResponse.json({ error: 'AI parsing failed. Add items manually.', pdf_upload_id, items: [] })
+      return NextResponse.json({ error: msg, pdf_upload_id, items: [] })
     }
   } catch (e) {
     console.error('PDF process error:', e)
