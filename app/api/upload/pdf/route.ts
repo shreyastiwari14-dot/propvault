@@ -19,14 +19,14 @@ export async function POST(request: NextRequest) {
 
     const supabase = adminClient()
 
-    // Download from Supabase and convert to base64 for Claude
-    const { data: fileData, error: dlError } = await supabase.storage.from('prop-pdfs').download(storage_path)
-    if (dlError) return NextResponse.json({ error: `Download failed: ${dlError.message}` }, { status: 500 })
-
-    const base64 = Buffer.from(await fileData.arrayBuffer()).toString('base64')
+    // Generate a signed download URL — Anthropic fetches the PDF directly (no 413, no size limit)
+    const { data: signedData, error: signErr } = await supabase.storage
+      .from('prop-pdfs')
+      .createSignedUrl(storage_path, 600)
+    if (signErr) return NextResponse.json({ error: `Signed URL failed: ${signErr.message}` }, { status: 500 })
 
     try {
-      const items = await extractItemsFromPdf(base64)
+      const items = await extractItemsFromPdf(signedData.signedUrl)
       await supabase.from('pdf_uploads').update({ status: 'Parsed', items_extracted: items.length }).eq('id', pdf_upload_id)
       return NextResponse.json({ pdf_upload_id, items, count: items.length })
     } catch (e) {

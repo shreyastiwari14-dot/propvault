@@ -8,10 +8,19 @@ const anthropic = new Anthropic({
 const MODEL = 'claude-sonnet-4-6'
 const FAST_MODEL = 'claude-haiku-4-5-20251001'
 
-export async function extractItemsFromPdf(pdfBase64: string): Promise<ExtractedItem[]> {
-  const prompt = `Extract every prop/item from this PDF. Return a compact JSON array — one object per item, no omissions:
-[{"name":"","category":"Furniture|Lighting|Textiles|Kitchenware|Art & Decor|Vehicles|Wardrobe|Electronics|Architectural|Miscellaneous","era_style":null,"dimensions_raw":null,"dimensions_l":null,"dimensions_w":null,"dimensions_h":null,"quantity_total":1,"condition":"Excellent|Good|Fair|Poor|null","description":""}]
-Rules: category and condition must match the exact values shown. dimensions in cm. description max 20 words. Return ONLY the JSON array.`
+export async function extractItemsFromPdf(pdfUrl: string): Promise<ExtractedItem[]> {
+  const prompt = `Extract every product/item listed in this PDF catalogue. This may be a furniture, prop, decor, or any product catalogue.
+
+Return a JSON array with one object per item — extract ALL items, do not skip any:
+[{"name":"","category":"Furniture|Lighting|Textiles|Kitchenware|Art & Decor|Vehicles|Wardrobe|Electronics|Architectural|Miscellaneous","era_style":null,"dimensions_raw":null,"dimensions_l":null,"dimensions_w":null,"dimensions_h":null,"quantity_total":1,"condition":null,"description":""}]
+
+Rules:
+- category: pick the closest match from the list, use Miscellaneous if unsure
+- dimensions: convert to cm if in other units
+- description: max 15 words describing the item
+- condition: always null (unknown for new catalogue items)
+- quantity_total: 1 unless stated
+Return ONLY the JSON array. No explanation.`
 
   const response = await anthropic.messages.create({
     model: FAST_MODEL,
@@ -20,14 +29,9 @@ Rules: category and condition must match the exact values shown. dimensions in c
       {
         role: 'user',
         content: [
-          {
-            type: 'document',
-            source: { type: 'base64', media_type: 'application/pdf', data: pdfBase64 },
-          },
-          {
-            type: 'text',
-            text: prompt,
-          },
+          // eslint-disable-next-line @typescript-eslint/no-explicit-any
+          { type: 'document', source: { type: 'url', url: pdfUrl } } as any,
+          { type: 'text', text: prompt },
         ],
       },
     ],
