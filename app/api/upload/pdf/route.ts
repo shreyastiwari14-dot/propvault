@@ -19,17 +19,18 @@ export async function POST(request: NextRequest) {
 
     const supabase = adminClient()
 
-    // Download from Supabase storage (already uploaded by client)
-    const { data: fileData, error: dlError } = await supabase.storage.from('prop-pdfs').download(storage_path)
-    if (dlError) return NextResponse.json({ error: `Download failed: ${dlError.message}` }, { status: 500 })
-
-    const buffer = Buffer.from(await fileData.arrayBuffer())
+    // Generate a signed URL — Claude fetches the PDF directly, nothing flows through Vercel
+    const { data: signedData, error: signErr } = await supabase.storage
+      .from('prop-pdfs')
+      .createSignedUrl(storage_path, 300) // 5 min expiry, enough for Claude to fetch
+    if (signErr) return NextResponse.json({ error: `Signed URL failed: ${signErr.message}` }, { status: 500 })
 
     try {
-      const items = await extractItemsFromPdf(buffer.toString('base64'))
+      const items = await extractItemsFromPdf(signedData.signedUrl)
       await supabase.from('pdf_uploads').update({ status: 'Parsed', items_extracted: items.length }).eq('id', pdf_upload_id)
       return NextResponse.json({ pdf_upload_id, items, count: items.length })
-    } catch {
+    } catch (e) {
+      console.error('Claude extraction error:', e)
       await supabase.from('pdf_uploads').update({ status: 'Failed' }).eq('id', pdf_upload_id)
       return NextResponse.json({ error: 'AI parsing failed. Add items manually.', pdf_upload_id, items: [] })
     }
