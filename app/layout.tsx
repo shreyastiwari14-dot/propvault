@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, Syne, JetBrains_Mono } from "next/font/google";
+import { Outfit, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import { PropListProvider } from "@/components/PropListContext";
@@ -11,13 +11,6 @@ const outfit = Outfit({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
-});
-
-const syne = Syne({
-  subsets: ["latin"],
-  variable: "--font-display",
-  display: "swap",
-  weight: ["400", "500", "600", "700", "800"],
 });
 
 const jetbrainsMono = JetBrains_Mono({
@@ -48,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${syne.variable} ${jetbrainsMono.variable}`}
+      className={`${outfit.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <script

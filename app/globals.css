@@ -1,9 +1,18 @@
 @import "tailwindcss";
 
+/* Theater Cond — local font */
+@font-face {
+  font-family: "Theater";
+  src: url("/fonts/Theater_Bold.otf") format("opentype");
+  font-weight: 400 900;
+  font-style: normal;
+  font-display: swap;
+}
+
 /* ══════════════════════════════════════════
    KGN PROPS — V3 Design System
    Theme: Editorial Cinematic × Film Industry
-   Fonts: Syne (display), Outfit (body), JetBrains Mono
+   Fonts: Theater (display), Outfit (body), JetBrains Mono
    ══════════════════════════════════════════ */
 
 @theme {
@@ -21,7 +30,7 @@
   --color-warm: #f06830;
   --color-warm-glow: rgba(240, 104, 48, 0.1);
   --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Theater", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 

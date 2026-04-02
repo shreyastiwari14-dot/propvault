@@ -131,10 +131,20 @@ function HeroSection({
       ref={ref}
       className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden"
     >
-      {/* ── Background Image Mosaic ── */}
-      <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        {/* Base gradient */}
-        <div className="absolute inset-0 bg-[#05050a]" />
+      {/* ── Background ── */}
+      <motion.div className="absolute inset-0 scale-110" style={{ y: bgY }}>
+        {/* Full-screen hero photo */}
+        <Image
+          src="https://oymcvzzfgmhaafnmizks.supabase.co/storage/v1/object/public/prop-images/hero/IMG_2802.jpeg"
+          alt="KGN Props — vintage Indian set"
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
+        />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-[#05050a]/72" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05050a] via-transparent to-transparent" />
 
         {/* Image grid behind text - visible on desktop */}
         {heroImages.length > 0 && (
