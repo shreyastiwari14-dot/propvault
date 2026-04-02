@@ -62,17 +62,17 @@ export default async function ItemPage({ params }: Props) {
   const whatsappNumber = process.env.NEXT_PUBLIC_WHATSAPP_NUMBER
 
   return (
-    <main className="min-h-screen bg-[#020206]">
+    <main className="min-h-screen bg-[#050507]">
       {/* Breadcrumb */}
-      <nav className="border-b border-[#1A1A2A] bg-[#090910]" aria-label="Breadcrumb">
+      <nav className="border-b border-white/[0.06] bg-[#0a0a0f]" aria-label="Breadcrumb">
         <div className="px-6 sm:px-10 py-4 max-w-7xl mx-auto flex items-center gap-2">
-          <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors uppercase tracking-[0.15em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">KGN</Link>
-          <span className="text-[#1A1A2A]" aria-hidden="true">/</span>
-          <Link href={`/${slug}`} className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
+          <Link href="/" className="font-mono text-xs text-[#555570] hover:text-[#f0f0f5] transition-colors uppercase tracking-[0.15em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-2 rounded">KGN</Link>
+          <span className="text-[#1a1a2a]" aria-hidden="true">/</span>
+          <Link href={`/${slug}`} className="font-mono text-xs text-[#555570] hover:text-[#f0f0f5] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-2 rounded">
             {item.category?.name ?? slug}
           </Link>
-          <span className="text-[#1A1A2A]" aria-hidden="true">/</span>
-          <span className="font-mono text-xs text-[#C8902A]" aria-current="page">{item.item_code}</span>
+          <span className="text-[#1a1a2a]" aria-hidden="true">/</span>
+          <span className="font-mono text-xs text-[#00e5c7]" aria-current="page">{item.item_code}</span>
         </div>
       </nav>
 
@@ -80,7 +80,7 @@ export default async function ItemPage({ params }: Props) {
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-10 lg:gap-16">
           {/* ── Left: Images ── */}
           <div className="space-y-3">
-            <div className="aspect-square relative bg-[#0E0E1A] rounded-xl overflow-hidden border border-[#1A1A2A]">
+            <div className="aspect-square relative bg-[#12121a] rounded-xl overflow-hidden border border-white/[0.06]">
               {primaryImage ? (
                 <Image
                   src={primaryImage.image_url}
@@ -91,7 +91,7 @@ export default async function ItemPage({ params }: Props) {
                   sizes="(max-width: 1024px) 100vw, 50vw"
                 />
               ) : (
-                <div className="w-full h-full flex items-center justify-center text-[#1A1A2A]">
+                <div className="w-full h-full flex items-center justify-center text-[#1a1a2a]">
                   <svg width="64" height="64" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24" aria-label="No image available" role="img">
                     <rect x="3" y="3" width="18" height="18" rx="2"/>
                     <path d="M3 9h18M9 21V9"/>
@@ -103,7 +103,7 @@ export default async function ItemPage({ params }: Props) {
             {sortedImages.length > 1 && (
               <div className="flex gap-2 overflow-x-auto pb-1" role="list" aria-label="Additional images">
                 {sortedImages.map((img) => (
-                  <div key={img.id} role="listitem" className="shrink-0 w-16 h-16 relative rounded-lg overflow-hidden border border-[#1A1A2A] bg-[#0E0E1A]">
+                  <div key={img.id} role="listitem" className="shrink-0 w-16 h-16 relative rounded-lg overflow-hidden border border-white/[0.06] bg-[#12121a]">
                     <Image src={img.image_url} alt="" fill className="object-cover" sizes="64px" />
                   </div>
                 ))}
@@ -115,12 +115,12 @@ export default async function ItemPage({ params }: Props) {
           <div className="space-y-6">
             <div>
               <div className="flex items-center gap-3 mb-4">
-                <span className="font-mono text-[#C8902A] text-sm tracking-widest">{item.item_code}</span>
+                <span className="font-mono text-[#00e5c7] text-sm tracking-widest">{item.item_code}</span>
                 <div className={`flex items-center gap-1.5 px-3 py-1 rounded-full border text-xs font-mono ${
                   item.status === 'available' ? 'border-green-500/30 bg-green-500/10 text-green-400' :
                   item.status === 'booked' ? 'border-red-500/30 bg-red-500/10 text-red-400' :
                   item.status === 'maintenance' ? 'border-yellow-500/30 bg-yellow-500/10 text-yellow-400' :
-                  'border-[#2A2A3A] text-[#555568]'
+                  'border-white/[0.08] text-[#555570]'
                 }`}>
                   <span className="w-1.5 h-1.5 rounded-full bg-current" aria-hidden="true" />
                   {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
@@ -130,13 +130,13 @@ export default async function ItemPage({ params }: Props) {
                 {item.name}
               </h1>
               {item.description && (
-                <p className="mt-3 text-[#7070A0] text-sm leading-relaxed" style={{ lineHeight: 1.65 }}>{item.description}</p>
+                <p className="mt-3 text-[#8888a0] text-sm leading-relaxed" style={{ lineHeight: 1.65 }}>{item.description}</p>
               )}
               {/* Style / use-case tags */}
               {(item.style || item.configuration) && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   {[item.style, item.configuration].filter(Boolean).map((tag) => (
-                    <span key={tag} className="font-medium text-[10px] uppercase tracking-[0.12em] text-[#C8902A] bg-[#C8902A]/10 border border-[#C8902A]/20 px-3 py-1 rounded-full">
+                    <span key={tag} className="font-medium text-[10px] uppercase tracking-[0.12em] text-[#00e5c7] bg-[#00e5c7]/10 border border-[#00e5c7]/20 px-3 py-1 rounded-full">
                       {tag}
                     </span>
                   ))}
@@ -146,17 +146,17 @@ export default async function ItemPage({ params }: Props) {
 
             {/* Availability */}
             <div className="grid grid-cols-2 gap-3">
-              <div className="bg-[#0E0E1A] border border-[#1A1A2A] rounded-xl p-4">
-                <div className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em] mb-1">In Stock</div>
-                <div className="font-display text-3xl font-light text-[#F0F0F5]">
+              <div className="bg-[#12121a] border border-white/[0.06] rounded-xl p-4">
+                <div className="font-mono text-[10px] text-[#555570] uppercase tracking-[0.2em] mb-1">In Stock</div>
+                <div className="font-display text-3xl font-light text-[#f0f0f5]">
                   {item.quantity_available}
-                  <span className="text-sm text-[#555568] font-mono ml-1">/ {item.quantity_total}</span>
+                  <span className="text-sm text-[#555570] font-mono ml-1">/ {item.quantity_total}</span>
                 </div>
               </div>
               {dims.length > 0 && (
-                <div className="bg-[#0E0E1A] border border-[#1A1A2A] rounded-xl p-4">
-                  <div className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em] mb-1">Dimensions</div>
-                  <div className="font-mono text-sm text-[#D0D0E0] leading-relaxed">{dims.join('\n')}</div>
+                <div className="bg-[#12121a] border border-white/[0.06] rounded-xl p-4">
+                  <div className="font-mono text-[10px] text-[#555570] uppercase tracking-[0.2em] mb-1">Dimensions</div>
+                  <div className="font-mono text-sm text-[#e0e0e8] leading-relaxed">{dims.join('\n')}</div>
                 </div>
               )}
             </div>
@@ -176,15 +176,15 @@ export default async function ItemPage({ params }: Props) {
             />
 
             {/* Specs table */}
-            <div className="border border-[#1A1A2A] rounded-xl overflow-hidden">
-              <div className="px-5 py-3 bg-[#0E0E1A] border-b border-[#1A1A2A]">
-                <h2 className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em]">Specifications</h2>
+            <div className="border border-white/[0.06] rounded-xl overflow-hidden">
+              <div className="px-5 py-3 bg-[#12121a] border-b border-white/[0.06]">
+                <h2 className="font-mono text-[10px] text-[#555570] uppercase tracking-[0.2em]">Specifications</h2>
               </div>
-              <dl className="divide-y divide-[#1A1A2A]">
+              <dl className="divide-y divide-white/[0.04]">
                 {specs.filter(([, v]) => v).map(([label, value]) => (
                   <div key={label} className="flex flex-col sm:flex-row sm:items-center px-4 sm:px-5 py-2.5 sm:py-3 gap-0.5 sm:gap-0">
-                    <dt className="font-mono text-[9px] text-[#555568] uppercase tracking-[0.15em] sm:w-28 shrink-0">{label}</dt>
-                    <dd className="text-sm text-[#D0D0E0] font-mono">{value}</dd>
+                    <dt className="font-mono text-[9px] text-[#555570] uppercase tracking-[0.15em] sm:w-28 shrink-0">{label}</dt>
+                    <dd className="text-sm text-[#e0e0e8] font-mono">{value}</dd>
                   </div>
                 ))}
               </dl>
@@ -194,11 +194,11 @@ export default async function ItemPage({ params }: Props) {
       </div>
 
       {/* Footer strip */}
-      <div className="border-t border-[#1A1A2A] px-6 sm:px-10 py-5 max-w-7xl mx-auto flex items-center justify-between">
-        <Link href={`/${slug}`} className="font-mono text-xs text-[#555568] hover:text-[#7070A0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
+      <div className="border-t border-white/[0.06] px-6 sm:px-10 py-5 max-w-7xl mx-auto flex items-center justify-between">
+        <Link href={`/${slug}`} className="font-mono text-xs text-[#555570] hover:text-[#8888a0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-2 rounded">
           ← More {item.category?.name}
         </Link>
-        <Link href="/" className="font-mono text-xs text-[#333348] hover:text-[#555568] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
+        <Link href="/" className="font-mono text-xs text-[#333348] hover:text-[#555570] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-2 rounded">
           KGN Furniture and Props
         </Link>
       </div>
