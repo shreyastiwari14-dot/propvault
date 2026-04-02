@@ -2,7 +2,9 @@ import type { Metadata } from "next";
 import { Inter, Space_Grotesk, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
-import { CartProvider } from "@/components/CartContext";
+import { PropListProvider } from "@/components/PropListContext";
+import PropListDrawer from "@/components/PropListDrawer";
+import PropListFab from "@/components/PropListFab";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -71,10 +73,12 @@ export default function RootLayout({
         />
       </head>
       <body className="font-sans bg-void text-text-primary antialiased">
-        <CartProvider>
+        <PropListProvider>
           <Navigation />
           {children}
-        </CartProvider>
+          <PropListDrawer />
+          <PropListFab />
+        </PropListProvider>
       </body>
     </html>
   );

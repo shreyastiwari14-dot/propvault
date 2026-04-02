@@ -1,6 +1,6 @@
 'use client'
 import { useState, useCallback } from 'react'
-import { useCart } from '@/components/CartContext'
+import { usePropList } from '@/components/PropListContext'
 import BookingForm from './BookingForm'
 
 interface ItemProps {
@@ -20,24 +20,22 @@ export default function ItemActions({
   item: ItemProps
   whatsappNumber?: string
 }) {
-  const { addToCart, isInCart, openCart } = useCart()
-  const inCart = isInCart(item.item_code)
+  const { add, has, open } = usePropList()
+  const inCart = has(item.item_code)
   const canBook = item.status === 'available' && item.quantity_available > 0
   const [copied, setCopied] = useState(false)
   const [showSingleBook, setShowSingleBook] = useState(false)
 
   const handleAddToCart = useCallback(() => {
-    if (inCart) { openCart(); return }
-    addToCart({
+    if (inCart) { open(); return }
+    add({
       id: item.id,
       item_code: item.item_code,
       name: item.name,
-      category_slug: item.category_slug,
-      image_url: item.image_url,
-      max_qty: item.quantity_available,
-      status: item.status,
+      category: item.category_slug,
+      thumbnail: item.image_url,
     })
-  }, [addToCart, openCart, inCart, item])
+  }, [add, open, inCart, item])
 
   const handleShare = useCallback(async () => {
     const url = window.location.href

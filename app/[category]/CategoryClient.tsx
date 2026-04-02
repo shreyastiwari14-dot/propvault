@@ -1,9 +1,10 @@
 "use client";
 
-import { useState, useRef } from "react";
+import { useState, useRef, useCallback } from "react";
 import { motion, useInView } from "framer-motion";
 import Image from "next/image";
 import Link from "next/link";
+import { usePropList, type PropListItem } from "@/components/PropListContext";
 
 /* ── Types ── */
 interface ItemData {
@@ -27,14 +28,20 @@ interface CategoryClientProps {
   items: ItemData[];
 }
 
-/* ── Animation ── */
+/* ── Animation Presets ── */
 const EASE = [0.22, 1, 0.36, 1] as const;
-const fadeUp = {
-  hidden: { opacity: 0, y: 24 },
-  visible: (i: number = 0) => ({
+
+const cardVariants = {
+  hidden: { opacity: 0, y: 30, scale: 0.97 },
+  visible: (i: number) => ({
     opacity: 1,
     y: 0,
-    transition: { duration: 0.6, ease: EASE, delay: i * 0.04 },
+    scale: 1,
+    transition: {
+      duration: 0.6,
+      ease: EASE,
+      delay: Math.min(i, 12) * 0.04,
+    },
   }),
 };
 
@@ -42,6 +49,7 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
   const [filter, setFilter] = useState<"all" | "available">("all");
   const gridRef = useRef(null);
   const gridInView = useInView(gridRef, { once: true, margin: "-40px" });
+  const { count } = usePropList();
 
   const filteredItems =
     filter === "available"
@@ -54,21 +62,26 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
       <div className="px-6 md:px-12 lg:px-20 xl:px-28 pt-8 pb-6 md:pt-12 md:pb-10">
         <div className="max-w-[1400px] mx-auto">
           {/* Breadcrumb */}
-          <nav className="flex items-center gap-2 mb-6 text-xs font-mono text-[#55556a]">
+          <motion.nav
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+            className="flex items-center gap-2 mb-6 text-xs font-mono text-[#55556a]"
+          >
             <Link href="/" className="hover:text-[#8b8ba0] transition-colors">
               Home
             </Link>
-            <span>/</span>
+            <span className="text-[#2a2a3a]">/</span>
             <span className="text-[#8b8ba0]">{category.name}</span>
-          </nav>
+          </motion.nav>
 
           {/* Title Row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <motion.h1
-                initial={{ opacity: 0, y: 20 }}
+                initial={{ opacity: 0, y: 24 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.6, ease: EASE }}
+                transition={{ duration: 0.7, ease: EASE }}
                 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight"
               >
                 {category.name}
@@ -79,14 +92,15 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
                 transition={{ delay: 0.2, duration: 0.5 }}
                 className="font-mono text-sm text-[#8b8ba0] mt-2"
               >
-                {category.item_count} pieces available
+                {filteredItems.length} pieces
+                {filter === "available" ? " available" : " in collection"}
               </motion.p>
             </div>
 
-            {/* Filter */}
+            {/* Filter Pills */}
             <motion.div
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
+              initial={{ opacity: 0, y: 10 }}
+              animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 0.3, duration: 0.5 }}
               className="flex items-center gap-2"
             >
@@ -97,7 +111,7 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
                   className={`px-4 py-2 font-mono text-xs tracking-wide rounded-lg border transition-all duration-300 ${
                     filter === f
                       ? "border-[#00d4b1] text-[#00d4b1] bg-[rgba(0,212,177,0.08)]"
-                      : "border-[rgba(255,255,255,0.07)] text-[#8b8ba0] hover:border-[rgba(255,255,255,0.14)]"
+                      : "border-[rgba(255,255,255,0.07)] text-[#8b8ba0] hover:border-[rgba(255,255,255,0.14)] hover:text-[#ededf0]"
                   }`}
                 >
                   {f === "all" ? "All Items" : "Available"}
@@ -111,7 +125,7 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
       {/* ── Item Grid ── */}
       <div
         ref={gridRef}
-        className="px-6 md:px-12 lg:px-20 xl:px-28 pb-20 md:pb-28"
+        className="px-6 md:px-12 lg:px-20 xl:px-28 pb-24 md:pb-28"
       >
         <div className="max-w-[1400px] mx-auto">
           {filteredItems.length === 0 ? (
@@ -125,12 +139,12 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
               {filteredItems.map((item, i) => (
                 <motion.div
                   key={item.id}
-                  variants={fadeUp}
+                  variants={cardVariants}
                   initial="hidden"
                   animate={gridInView ? "visible" : "hidden"}
-                  custom={Math.min(i, 15)} // Cap delay so late items don't wait forever
+                  custom={i}
                 >
-                  <ItemCard item={item} categorySlug={category.slug} />
+                  <ItemCard item={item} categorySlug={category.slug} categoryName={category.name} />
                 </motion.div>
               ))}
             </div>
@@ -141,15 +155,46 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
   );
 }
 
-/* ── Item Card ── */
-function ItemCard({ item, categorySlug }: { item: ItemData; categorySlug: string }) {
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ITEM CARD with Add-to-List
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function ItemCard({
+  item,
+  categorySlug,
+  categoryName,
+}: {
+  item: ItemData;
+  categorySlug: string;
+  categoryName: string;
+}) {
   const [imgError, setImgError] = useState(false);
+  const { toggle, has } = usePropList();
   const isAvailable = item.status === "available" && item.quantity_available > 0;
+  const isInList = has(item.item_code);
+
+  const handleToggle = useCallback(
+    (e: React.MouseEvent) => {
+      e.preventDefault(); // don't navigate to item page
+      e.stopPropagation();
+      toggle({
+        id: item.id,
+        item_code: item.item_code,
+        name: item.name,
+        category: categoryName,
+        thumbnail: item.thumbnail,
+      });
+    },
+    [toggle, item, categoryName]
+  );
 
   return (
     <Link
       href={`/${categorySlug}/${item.item_code}`}
-      className="group block rounded-xl overflow-hidden bg-[#0c0c12] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(0,212,177,0.25)] transition-all duration-400"
+      className={`group relative block rounded-xl overflow-hidden bg-[#0c0c12] border transition-all duration-400 ${
+        isInList
+          ? "border-[#00d4b1] shadow-[0_0_20px_rgba(0,212,177,0.08)]"
+          : "border-[rgba(255,255,255,0.07)] hover:border-[rgba(0,212,177,0.25)]"
+      }`}
     >
       {/* Image */}
       <div className="relative aspect-[4/5] bg-[#0a0a10] overflow-hidden">
@@ -159,7 +204,7 @@ function ItemCard({ item, categorySlug }: { item: ItemData; categorySlug: string
             alt={item.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            className="object-cover transition-all duration-500 ease-out group-hover:scale-105 group-hover:brightness-110"
             onError={() => setImgError(true)}
           />
         ) : (
@@ -168,18 +213,43 @@ function ItemCard({ item, categorySlug }: { item: ItemData; categorySlug: string
           </div>
         )}
 
-        {/* Status badge */}
-        <div className="absolute top-3 right-3">
+        {/* Dark overlay on hover */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06060a]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+
+        {/* Status badge — top left */}
+        <div className="absolute top-3 left-3">
           <span
-            className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wide ${
+            className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wide backdrop-blur-sm ${
               isAvailable
-                ? "bg-[rgba(0,212,177,0.15)] text-[#00d4b1]"
-                : "bg-[rgba(255,80,80,0.15)] text-[#ff5050]"
+                ? "bg-[rgba(0,212,177,0.2)] text-[#00d4b1]"
+                : "bg-[rgba(255,80,80,0.2)] text-[#ff5050]"
             }`}
           >
             {isAvailable ? "Available" : "Booked"}
           </span>
         </div>
+
+        {/* Add to List button — top right */}
+        <button
+          onClick={handleToggle}
+          className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 ${
+            isInList
+              ? "bg-[#00d4b1] text-[#06060a] scale-100"
+              : "bg-[rgba(0,0,0,0.5)] text-white opacity-0 group-hover:opacity-100 hover:bg-[#00d4b1] hover:text-[#06060a]"
+          }`}
+          aria-label={isInList ? "Remove from list" : "Add to list"}
+        >
+          {isInList ? (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <polyline points="20 6 9 17 4 12" />
+            </svg>
+          ) : (
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+              <line x1="12" y1="5" x2="12" y2="19" />
+              <line x1="5" y1="12" x2="19" y2="12" />
+            </svg>
+          )}
+        </button>
       </div>
 
       {/* Info */}
