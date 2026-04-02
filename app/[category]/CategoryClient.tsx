@@ -45,15 +45,19 @@ const cardVariants = {
   }),
 };
 
-export default function CategoryClient({ category, items }: CategoryClientProps) {
+export default function CategoryClient({
+  category,
+  items,
+}: CategoryClientProps) {
   const [filter, setFilter] = useState<"all" | "available">("all");
   const gridRef = useRef(null);
   const gridInView = useInView(gridRef, { once: true, margin: "-40px" });
-  const { count } = usePropList();
 
   const filteredItems =
     filter === "available"
-      ? items.filter((item) => item.status === "available" && item.quantity_available > 0)
+      ? items.filter(
+          (item) => item.status === "available" && item.quantity_available > 0
+        )
       : items;
 
   return (
@@ -66,23 +70,23 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             transition={{ duration: 0.4 }}
-            className="flex items-center gap-2 mb-6 text-xs font-mono text-[#55556a]"
+            className="flex items-center gap-2 mb-6 text-[11px] font-mono text-[#4e4e66]"
           >
-            <Link href="/" className="hover:text-[#8b8ba0] transition-colors">
+            <Link href="/" className="hover:text-[#8a8a9e] transition-colors">
               Home
             </Link>
             <span className="text-[#2a2a3a]">/</span>
-            <span className="text-[#8b8ba0]">{category.name}</span>
+            <span className="text-[#8a8a9e]">{category.name}</span>
           </motion.nav>
 
           {/* Title Row */}
           <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
             <div>
               <motion.h1
-                initial={{ opacity: 0, y: 24 }}
+                initial={{ opacity: 0, y: 30 }}
                 animate={{ opacity: 1, y: 0 }}
-                transition={{ duration: 0.7, ease: EASE }}
-                className="font-display font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight"
+                transition={{ duration: 0.8, ease: EASE }}
+                className="font-display font-extrabold text-3xl md:text-4xl lg:text-5xl tracking-tight"
               >
                 {category.name}
               </motion.h1>
@@ -90,7 +94,7 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 transition={{ delay: 0.2, duration: 0.5 }}
-                className="font-mono text-sm text-[#8b8ba0] mt-2"
+                className="font-mono text-sm text-[#8a8a9e] mt-2"
               >
                 {filteredItems.length} pieces
                 {filter === "available" ? " available" : " in collection"}
@@ -108,10 +112,10 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
                 <button
                   key={f}
                   onClick={() => setFilter(f)}
-                  className={`px-4 py-2 font-mono text-xs tracking-wide rounded-lg border transition-all duration-300 ${
+                  className={`px-4 py-2.5 font-mono text-xs tracking-wide rounded-xl border transition-all duration-300 ${
                     filter === f
-                      ? "border-[#00d4b1] text-[#00d4b1] bg-[rgba(0,212,177,0.08)]"
-                      : "border-[rgba(255,255,255,0.07)] text-[#8b8ba0] hover:border-[rgba(255,255,255,0.14)] hover:text-[#ededf0]"
+                      ? "border-[#00d4b1] text-[#00d4b1] bg-[rgba(0,212,177,0.06)]"
+                      : "border-[rgba(255,255,255,0.06)] text-[#8a8a9e] hover:border-[rgba(255,255,255,0.12)] hover:text-[#f0f0f3]"
                   }`}
                 >
                   {f === "all" ? "All Items" : "Available"}
@@ -130,7 +134,7 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
         <div className="max-w-[1400px] mx-auto">
           {filteredItems.length === 0 ? (
             <div className="text-center py-20">
-              <p className="text-[#55556a] font-mono text-sm">
+              <p className="text-[#4e4e66] font-mono text-sm">
                 No items match your filter.
               </p>
             </div>
@@ -144,7 +148,11 @@ export default function CategoryClient({ category, items }: CategoryClientProps)
                   animate={gridInView ? "visible" : "hidden"}
                   custom={i}
                 >
-                  <ItemCard item={item} categorySlug={category.slug} categoryName={category.name} />
+                  <ItemCard
+                    item={item}
+                    categorySlug={category.slug}
+                    categoryName={category.name}
+                  />
                 </motion.div>
               ))}
             </div>
@@ -169,12 +177,13 @@ function ItemCard({
 }) {
   const [imgError, setImgError] = useState(false);
   const { toggle, has } = usePropList();
-  const isAvailable = item.status === "available" && item.quantity_available > 0;
+  const isAvailable =
+    item.status === "available" && item.quantity_available > 0;
   const isInList = has(item.item_code);
 
   const handleToggle = useCallback(
     (e: React.MouseEvent) => {
-      e.preventDefault(); // don't navigate to item page
+      e.preventDefault();
       e.stopPropagation();
       toggle({
         id: item.id,
@@ -190,61 +199,80 @@ function ItemCard({
   return (
     <Link
       href={`/${categorySlug}/${item.item_code}`}
-      className={`group relative block rounded-xl overflow-hidden bg-[#0c0c12] border transition-all duration-400 ${
+      className={`group relative block rounded-2xl overflow-hidden bg-[#0a0a12] border transition-all duration-500 ${
         isInList
-          ? "border-[#00d4b1] shadow-[0_0_20px_rgba(0,212,177,0.08)]"
-          : "border-[rgba(255,255,255,0.07)] hover:border-[rgba(0,212,177,0.25)]"
+          ? "border-[#00d4b1] shadow-[0_0_24px_rgba(0,212,177,0.08)]"
+          : "border-[rgba(255,255,255,0.06)] hover:border-[rgba(0,212,177,0.2)]"
       }`}
     >
       {/* Image */}
-      <div className="relative aspect-[4/5] bg-[#0a0a10] overflow-hidden">
+      <div className="relative aspect-[4/5] bg-[#08080e] overflow-hidden">
         {item.thumbnail && !imgError ? (
           <Image
             src={item.thumbnail}
             alt={item.name}
             fill
             sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            className="object-cover transition-all duration-500 ease-out group-hover:scale-105 group-hover:brightness-110"
+            className="object-cover transition-all duration-600 ease-out group-hover:scale-106"
             onError={() => setImgError(true)}
           />
         ) : (
           <div className="absolute inset-0 flex items-center justify-center">
-            <span className="font-mono text-sm text-[#2a2a3a]">{item.item_code}</span>
+            <span className="font-mono text-sm text-[#1e1e30]">
+              {item.item_code}
+            </span>
           </div>
         )}
 
-        {/* Dark overlay on hover */}
-        <div className="absolute inset-0 bg-gradient-to-t from-[#06060a]/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+        {/* Dark overlay */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05050a]/70 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
 
-        {/* Status badge — top left */}
+        {/* Status badge */}
         <div className="absolute top-3 left-3">
           <span
             className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wide backdrop-blur-sm ${
               isAvailable
-                ? "bg-[rgba(0,212,177,0.2)] text-[#00d4b1]"
-                : "bg-[rgba(255,80,80,0.2)] text-[#ff5050]"
+                ? "bg-[rgba(0,212,177,0.15)] text-[#00d4b1]"
+                : "bg-[rgba(255,80,80,0.15)] text-[#ff5050]"
             }`}
           >
             {isAvailable ? "Available" : "Booked"}
           </span>
         </div>
 
-        {/* Add to List button — top right */}
+        {/* Add to List button */}
         <button
           onClick={handleToggle}
           className={`absolute top-3 right-3 w-9 h-9 flex items-center justify-center rounded-full backdrop-blur-md transition-all duration-300 ${
             isInList
-              ? "bg-[#00d4b1] text-[#06060a] scale-100"
-              : "bg-[rgba(0,0,0,0.5)] text-white opacity-0 group-hover:opacity-100 hover:bg-[#00d4b1] hover:text-[#06060a]"
+              ? "bg-[#00d4b1] text-[#05050a] scale-100"
+              : "bg-[rgba(0,0,0,0.5)] text-white opacity-0 group-hover:opacity-100 hover:bg-[#00d4b1] hover:text-[#05050a]"
           }`}
           aria-label={isInList ? "Remove from list" : "Add to list"}
         >
           {isInList ? (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+            >
               <polyline points="20 6 9 17 4 12" />
             </svg>
           ) : (
-            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round">
+            <svg
+              width="16"
+              height="16"
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="2"
+              strokeLinecap="round"
+            >
               <line x1="12" y1="5" x2="12" y2="19" />
               <line x1="5" y1="12" x2="19" y2="12" />
             </svg>
@@ -254,15 +282,15 @@ function ItemCard({
 
       {/* Info */}
       <div className="p-4">
-        <h3 className="font-display font-medium text-sm text-[#ededf0] truncate group-hover:text-[#00d4b1] transition-colors duration-300">
+        <h3 className="font-display font-semibold text-sm text-[#f0f0f3] truncate group-hover:text-[#00d4b1] transition-colors duration-300">
           {item.name}
         </h3>
         <div className="flex items-center justify-between mt-1.5">
-          <span className="font-mono text-[11px] text-[#55556a]">
+          <span className="font-mono text-[11px] text-[#4e4e66]">
             {item.item_code}
           </span>
           {item.quantity_total > 1 && (
-            <span className="font-mono text-[11px] text-[#55556a]">
+            <span className="font-mono text-[11px] text-[#4e4e66]">
               Qty: {item.quantity_available}/{item.quantity_total}
             </span>
           )}

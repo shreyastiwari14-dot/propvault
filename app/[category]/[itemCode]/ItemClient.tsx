@@ -46,11 +46,16 @@ const waLink = (code: string) =>
 /* ── Animation ── */
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-export default function ItemClient({ item, images, category }: ItemClientProps) {
+export default function ItemClient({
+  item,
+  images,
+  category,
+}: ItemClientProps) {
   const [activeImg, setActiveImg] = useState(0);
   const [lightbox, setLightbox] = useState(false);
 
-  const isAvailable = item.status === "available" && item.quantity_available > 0;
+  const isAvailable =
+    item.status === "available" && item.quantity_available > 0;
   const primaryImg = images[activeImg]?.url || images[0]?.url || null;
 
   // Build specs table
@@ -74,32 +79,35 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
         <div className="px-6 md:px-12 lg:px-20 xl:px-28 py-8 md:py-12">
           <div className="max-w-[1400px] mx-auto">
             {/* Breadcrumb */}
-            <nav className="flex items-center gap-2 mb-8 text-xs font-mono text-[#55556a]">
-              <Link href="/" className="hover:text-[#8b8ba0] transition-colors">
+            <nav className="flex items-center gap-2 mb-8 text-[11px] font-mono text-[#4e4e66]">
+              <Link
+                href="/"
+                className="hover:text-[#8a8a9e] transition-colors"
+              >
                 Home
               </Link>
               <span>/</span>
               <Link
                 href={`/${category.slug}`}
-                className="hover:text-[#8b8ba0] transition-colors"
+                className="hover:text-[#8a8a9e] transition-colors"
               >
                 {category.name}
               </Link>
               <span>/</span>
-              <span className="text-[#8b8ba0]">{item.item_code}</span>
+              <span className="text-[#8a8a9e]">{item.item_code}</span>
             </nav>
 
             {/* ── Split Layout ── */}
             <div className="grid lg:grid-cols-[1.1fr_1fr] gap-8 md:gap-12 lg:gap-16">
               {/* LEFT — Images */}
               <motion.div
-                initial={{ opacity: 0, x: -20 }}
+                initial={{ opacity: 0, x: -30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, ease: EASE }}
+                transition={{ duration: 0.7, ease: EASE }}
               >
                 {/* Main Image */}
                 <div
-                  className="relative aspect-[4/5] bg-[#0c0c12] rounded-xl overflow-hidden cursor-zoom-in border border-[rgba(255,255,255,0.07)]"
+                  className="relative aspect-[4/5] bg-[#0a0a12] rounded-2xl overflow-hidden cursor-zoom-in border border-[rgba(255,255,255,0.06)]"
                   onClick={() => setLightbox(true)}
                 >
                   {primaryImg ? (
@@ -113,7 +121,7 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
                     />
                   ) : (
                     <div className="absolute inset-0 flex items-center justify-center">
-                      <span className="font-mono text-lg text-[#2a2a3a]">
+                      <span className="font-mono text-lg text-[#1e1e30]">
                         {item.item_code}
                       </span>
                     </div>
@@ -127,10 +135,10 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
                       <button
                         key={img.id}
                         onClick={() => setActiveImg(i)}
-                        className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-lg overflow-hidden border-2 transition-all ${
+                        className={`relative flex-shrink-0 w-16 h-16 md:w-20 md:h-20 rounded-xl overflow-hidden border-2 transition-all ${
                           activeImg === i
                             ? "border-[#00d4b1]"
-                            : "border-[rgba(255,255,255,0.07)] hover:border-[rgba(255,255,255,0.14)]"
+                            : "border-[rgba(255,255,255,0.06)] hover:border-[rgba(255,255,255,0.12)]"
                         }`}
                       >
                         <Image
@@ -148,24 +156,24 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
 
               {/* RIGHT — Details */}
               <motion.div
-                initial={{ opacity: 0, x: 20 }}
+                initial={{ opacity: 0, x: 30 }}
                 animate={{ opacity: 1, x: 0 }}
-                transition={{ duration: 0.6, ease: EASE, delay: 0.1 }}
+                transition={{ duration: 0.7, ease: EASE, delay: 0.1 }}
                 className="flex flex-col"
               >
                 {/* Status */}
                 <span
-                  className={`inline-block w-fit px-3 py-1 rounded-full text-xs font-mono tracking-wide mb-4 ${
+                  className={`inline-block w-fit px-3 py-1.5 rounded-full text-xs font-mono tracking-wide mb-4 ${
                     isAvailable
-                      ? "bg-[rgba(0,212,177,0.12)] text-[#00d4b1]"
-                      : "bg-[rgba(255,80,80,0.12)] text-[#ff5050]"
+                      ? "bg-[rgba(0,212,177,0.1)] text-[#00d4b1]"
+                      : "bg-[rgba(255,80,80,0.1)] text-[#ff5050]"
                   }`}
                 >
                   {isAvailable ? "Available for Booking" : "Currently Booked"}
                 </span>
 
                 {/* Name */}
-                <h1 className="font-display font-bold text-2xl md:text-3xl lg:text-4xl tracking-tight mb-2">
+                <h1 className="font-display font-extrabold text-2xl md:text-3xl lg:text-4xl tracking-tight mb-2">
                   {item.name}
                 </h1>
 
@@ -176,14 +184,14 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
 
                 {/* Description */}
                 {item.description && (
-                  <p className="text-[#8b8ba0] leading-relaxed mb-8">
+                  <p className="text-[#8a8a9e] leading-relaxed mb-8">
                     {item.description}
                   </p>
                 )}
 
                 {/* Specs Table */}
-                <div className="border-t border-[rgba(255,255,255,0.07)] pt-6 mb-8">
-                  <h3 className="font-mono text-xs tracking-[0.15em] uppercase text-[#55556a] mb-4">
+                <div className="border-t border-[rgba(255,255,255,0.06)] pt-6 mb-8">
+                  <h3 className="font-mono text-[11px] tracking-[0.15em] uppercase text-[#4e4e66] mb-4">
                     Specifications
                   </h3>
                   <div className="space-y-3">
@@ -192,8 +200,8 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
                         key={label}
                         className="flex justify-between items-baseline py-2 border-b border-[rgba(255,255,255,0.04)]"
                       >
-                        <span className="text-sm text-[#8b8ba0]">{label}</span>
-                        <span className="text-sm text-[#ededf0] font-medium text-right ml-4">
+                        <span className="text-sm text-[#8a8a9e]">{label}</span>
+                        <span className="text-sm text-[#f0f0f3] font-medium text-right ml-4">
                           {value}
                         </span>
                       </div>
@@ -207,7 +215,7 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
                     href={waLink(item.item_code)}
                     target="_blank"
                     rel="noopener noreferrer"
-                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-[#00d4b1] text-[#06060a] font-display font-semibold text-sm rounded-lg hover:bg-[#00f0cc] transition-colors"
+                    className="flex items-center justify-center gap-2 w-full px-6 py-4 bg-[#00d4b1] text-[#05050a] font-display font-bold text-sm rounded-xl hover:bg-[#00f0cc] hover:shadow-[0_0_30px_rgba(0,212,177,0.15)] transition-all duration-400"
                   >
                     <svg
                       width="18"
@@ -223,7 +231,7 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
 
                   <Link
                     href={`/${category.slug}`}
-                    className="flex items-center justify-center gap-2 w-full px-6 py-3.5 border border-[rgba(255,255,255,0.12)] text-[#8b8ba0] font-display text-sm rounded-lg hover:border-[rgba(255,255,255,0.25)] hover:text-[#ededf0] transition-all"
+                    className="flex items-center justify-center gap-2 w-full px-6 py-3.5 border border-[rgba(255,255,255,0.1)] text-[#8a8a9e] font-display text-sm rounded-xl hover:border-[rgba(255,255,255,0.2)] hover:text-[#f0f0f3] transition-all duration-400"
                   >
                     ← Back to {category.name}
                   </Link>
@@ -241,11 +249,11 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
             initial={{ opacity: 0 }}
             animate={{ opacity: 1 }}
             exit={{ opacity: 0 }}
-            className="fixed inset-0 z-50 bg-[#06060a]/95 backdrop-blur-xl flex items-center justify-center p-6"
+            className="fixed inset-0 z-50 bg-[#05050a]/95 backdrop-blur-xl flex items-center justify-center p-6"
             onClick={() => setLightbox(false)}
           >
             <button
-              className="absolute top-6 right-6 text-[#8b8ba0] hover:text-white transition-colors font-mono text-sm"
+              className="absolute top-6 right-6 text-[#8a8a9e] hover:text-white transition-colors font-mono text-sm"
               onClick={() => setLightbox(false)}
             >
               ✕ Close
@@ -270,19 +278,21 @@ export default function ItemClient({ item, images, category }: ItemClientProps) 
       </AnimatePresence>
 
       {/* ── Mobile Sticky Book Bar ── */}
-      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-[#06060a]/90 backdrop-blur-xl border-t border-[rgba(255,255,255,0.07)] p-4">
+      <div className="fixed bottom-0 left-0 right-0 z-40 lg:hidden bg-[#05050a]/90 backdrop-blur-xl border-t border-[rgba(255,255,255,0.06)] p-4">
         <div className="flex items-center gap-3">
           <div className="flex-1 min-w-0">
-            <p className="font-display font-semibold text-sm text-[#ededf0] truncate">
+            <p className="font-display font-bold text-sm text-[#f0f0f3] truncate">
               {item.name}
             </p>
-            <p className="font-mono text-[11px] text-[#55556a]">{item.item_code}</p>
+            <p className="font-mono text-[11px] text-[#4e4e66]">
+              {item.item_code}
+            </p>
           </div>
           <a
             href={waLink(item.item_code)}
             target="_blank"
             rel="noopener noreferrer"
-            className="flex-shrink-0 px-6 py-3 bg-[#00d4b1] text-[#06060a] font-display font-semibold text-sm rounded-lg"
+            className="flex-shrink-0 px-6 py-3 bg-[#00d4b1] text-[#05050a] font-display font-bold text-sm rounded-xl"
           >
             Book Now
           </a>

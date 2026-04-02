@@ -1,26 +1,27 @@
 @import "tailwindcss";
 
 /* ══════════════════════════════════════════
-   KGN PROPS — Design System
-   Theme: Luxury Editorial × Film Industry
+   KGN PROPS — V3 Design System
+   Theme: Editorial Cinematic × Film Industry
+   Fonts: Syne (display), Outfit (body), JetBrains Mono
    ══════════════════════════════════════════ */
 
 @theme {
-  --color-void: #06060a;
-  --color-surface: #0c0c12;
-  --color-elevated: #141420;
-  --color-border: rgba(255, 255, 255, 0.07);
-  --color-border-hover: rgba(255, 255, 255, 0.14);
-  --color-text-primary: #ededf0;
-  --color-text-secondary: #8b8ba0;
-  --color-text-muted: #55556a;
+  --color-void: #05050a;
+  --color-surface: #0a0a12;
+  --color-elevated: #111120;
+  --color-border: rgba(255, 255, 255, 0.06);
+  --color-border-hover: rgba(255, 255, 255, 0.12);
+  --color-text-primary: #f0f0f3;
+  --color-text-secondary: #8a8a9e;
+  --color-text-muted: #4e4e66;
   --color-accent: #00d4b1;
-  --color-accent-glow: rgba(0, 212, 177, 0.12);
+  --color-accent-glow: rgba(0, 212, 177, 0.1);
   --color-accent-hover: #00f0cc;
   --color-warm: #f06830;
-  --color-warm-glow: rgba(240, 104, 48, 0.12);
-  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Space Grotesk", ui-sans-serif, system-ui, sans-serif;
+  --color-warm-glow: rgba(240, 104, 48, 0.1);
+  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
+  --font-display: "Syne", ui-sans-serif, system-ui, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
@@ -34,14 +35,27 @@
   }
 
   html {
-    scroll-behavior: smooth;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
   }
 
+  /* Lenis smooth scroll */
+  html.lenis, html.lenis body {
+    height: auto;
+  }
+  .lenis.lenis-smooth {
+    scroll-behavior: auto !important;
+  }
+  .lenis.lenis-smooth [data-lenis-prevent] {
+    overscroll-behavior: contain;
+  }
+  .lenis.lenis-stopped {
+    overflow: hidden;
+  }
+
   body {
-    background-color: #06060a;
-    color: #ededf0;
+    background-color: #05050a;
+    color: #f0f0f3;
     font-family: var(--font-sans);
     overflow-x: hidden;
   }
@@ -54,20 +68,20 @@
     position: fixed;
     inset: 0;
     background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.4'/%3E%3C/svg%3E");
-    opacity: 0.025;
+    opacity: 0.02;
     pointer-events: none;
     z-index: 9999;
   }
 
   /* ── Scrollbar ── */
   ::-webkit-scrollbar {
-    width: 6px;
+    width: 5px;
   }
   ::-webkit-scrollbar-track {
-    background: #06060a;
+    background: #05050a;
   }
   ::-webkit-scrollbar-thumb {
-    background: #2a2a3a;
+    background: #1e1e30;
     border-radius: 3px;
   }
   ::-webkit-scrollbar-thumb:hover {
@@ -76,7 +90,7 @@
 
   /* ── Selection ── */
   ::selection {
-    background: rgba(0, 212, 177, 0.25);
+    background: rgba(0, 212, 177, 0.2);
     color: #fff;
   }
 }
@@ -92,14 +106,44 @@
 
   /* Glass effect */
   .glass {
-    background: rgba(12, 12, 18, 0.6);
-    backdrop-filter: blur(16px);
-    -webkit-backdrop-filter: blur(16px);
-    border: 1px solid rgba(255, 255, 255, 0.07);
+    background: rgba(10, 10, 18, 0.7);
+    backdrop-filter: blur(20px);
+    -webkit-backdrop-filter: blur(20px);
+    border: 1px solid rgba(255, 255, 255, 0.06);
+  }
+
+  /* Section label style */
+  .section-label {
+    font-family: var(--font-mono);
+    font-size: 0.6875rem;
+    letter-spacing: 0.2em;
+    text-transform: uppercase;
+    color: #00d4b1;
+  }
+
+  /* Horizontal scroll container */
+  .horizontal-scroll-section {
+    overflow: hidden;
+  }
+  .horizontal-scroll-track {
+    display: flex;
+    gap: 1.5rem;
+    will-change: transform;
+  }
+
+  /* Image zoom on hover */
+  .img-zoom {
+    overflow: hidden;
+  }
+  .img-zoom img {
+    transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+  .img-zoom:hover img {
+    transform: scale(1.06);
   }
 }
 
-/* Keyframes (these are fine outside layers) */
+/* Keyframes (outside layers — they don't conflict) */
 @keyframes marquee {
   0% { transform: translateX(0); }
   100% { transform: translateX(-50%); }
@@ -112,32 +156,42 @@
   0%, 100% { box-shadow: 0 0 0 0 rgba(37, 211, 102, 0.4); }
   50% { box-shadow: 0 0 0 12px rgba(37, 211, 102, 0); }
 }
-@keyframes count-fade {
-  from { opacity: 0; transform: translateY(8px); }
+@keyframes float {
+  0%, 100% { transform: translateY(0px); }
+  50% { transform: translateY(-8px); }
+}
+@keyframes reveal-up {
+  from { transform: translateY(105%); }
+  to { transform: translateY(0%); }
+}
+@keyframes fade-in-up {
+  from { opacity: 0; transform: translateY(30px); }
   to { opacity: 1; transform: translateY(0); }
 }
+@keyframes scroll-line {
+  0% { transform: scaleY(0); transform-origin: top; }
+  50% { transform: scaleY(1); transform-origin: top; }
+  51% { transform: scaleY(1); transform-origin: bottom; }
+  100% { transform: scaleY(0); transform-origin: bottom; }
+}
 
-/* Custom utility classes inside @layer so they don't override Tailwind */
 @layer components {
   .animate-marquee {
-    animation: marquee 30s linear infinite;
+    animation: marquee 35s linear infinite;
   }
   .shimmer {
-    background: linear-gradient(90deg, #0c0c12 25%, #1a1a28 50%, #0c0c12 75%);
+    background: linear-gradient(90deg, #0a0a12 25%, #161628 50%, #0a0a12 75%);
     background-size: 200% 100%;
     animation: shimmer 1.8s ease-in-out infinite;
   }
   .pulse-glow {
     animation: pulse-glow 2.5s ease-in-out infinite;
   }
-  .img-zoom {
-    overflow: hidden;
+  .animate-float {
+    animation: float 4s ease-in-out infinite;
   }
-  .img-zoom img {
-    transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
-  }
-  .img-zoom:hover img {
-    transform: scale(1.05);
+  .animate-scroll-line {
+    animation: scroll-line 2s ease-in-out infinite;
   }
 }
 
@@ -151,5 +205,14 @@
   /* Smooth image loading */
   img {
     transition: opacity 0.3s ease;
+  }
+
+  /* Clip-path text reveal helper */
+  .clip-reveal {
+    clip-path: inset(0 0 100% 0);
+  }
+  .clip-reveal.revealed {
+    clip-path: inset(0 0 0% 0);
+    transition: clip-path 0.8s cubic-bezier(0.22, 1, 0.36, 1);
   }
 }
