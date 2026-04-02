@@ -27,14 +27,49 @@ const cormorant = Cormorant_Garamond({
 })
 
 export const metadata: Metadata = {
-  title: 'KGN Furniture and Props — Film & Production',
-  description: 'Browse and book premium furniture and props for film, OTT and production. Sofas, chairs, tables, mirrors, racks and more.',
+  title: 'Prop Rental for Film & OTT Production | KGN Furniture and Props — Mumbai',
+  description: 'Furniture and prop rental for Bollywood, Netflix, and commercial shoots. 500+ catalogued pieces in Mumbai. Inspect before you book. Est. 1994.',
+}
+
+const jsonLd = {
+  '@context': 'https://schema.org',
+  '@type': 'LocalBusiness',
+  name: 'KGN Furniture and Props',
+  description:
+    'Prop rental for Bollywood, OTT, and commercial film productions. Furniture and period pieces for set design. Mumbai showroom, established 1994.',
+  url: 'https://propvault-six.vercel.app',
+  address: {
+    '@type': 'PostalAddress',
+    addressLocality: 'Mumbai',
+    addressRegion: 'Maharashtra',
+    addressCountry: 'IN',
+  },
+  foundingDate: '1994',
+  keywords:
+    'prop rental Mumbai, film props Mumbai, Bollywood prop rental, OTT production props, set decoration props, furniture rental film shoots',
+  priceRange: '₹₹',
+  currenciesAccepted: 'INR',
+  paymentAccepted: 'Cash, Bank Transfer',
+  openingHoursSpecification: [
+    {
+      '@type': 'OpeningHoursSpecification',
+      dayOfWeek: ['Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'],
+      opens: '10:00',
+      closes: '18:00',
+    },
+  ],
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className={`${dmSans.variable} ${ibmPlexMono.variable} ${cormorant.variable}`}>
-      <body className="font-sans bg-[#0A0A0F] text-[#F0F0F5] antialiased">
+      <head>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        />
+      </head>
+      <body className="font-sans bg-[#020206] text-[#F0F0F5] antialiased">
         <CartProvider>
           {children}
           <CartDrawer />

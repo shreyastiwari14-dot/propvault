@@ -50,7 +50,7 @@ function StatusDot({ status }: { status: string }) {
   return (
     <span className="flex items-center gap-1.5">
       <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cls}`} />
-      <span className="text-[10px] font-mono text-[#8888A0]">{label}</span>
+      <span className="text-[10px] font-mono text-[#7070A0]">{label}</span>
     </span>
   )
 }
@@ -82,7 +82,7 @@ function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: n
       viewport={{ once: true, margin: '-40px' }}
       custom={index % 12}
     >
-      <div className="group relative bg-[#0D0D14] border border-[#1A1A2A] rounded-lg overflow-hidden hover:border-[#3A3A4A] transition-colors duration-300">
+      <div className="group relative bg-[#090910] border border-[#1A1A2A] rounded-lg overflow-hidden hover:border-[#3A3A4A] transition-colors duration-300">
         {/* Image */}
         <Link href={`/${categorySlug}/${item.item_code}`} className="block">
           <div className="aspect-[4/3] relative bg-[#111118] overflow-hidden">
@@ -96,7 +96,7 @@ function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: n
               />
             ) : (
               <div className="w-full h-full flex items-center justify-center text-[#1A1A2A]">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24">
+                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24" aria-label="No image available" role="img">
                   <rect x="3" y="3" width="18" height="18" rx="2"/>
                   <path d="M3 9h18M9 21V9"/>
                 </svg>
@@ -117,10 +117,10 @@ function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: n
               </span>
             )}
 
-            {/* In-cart indicator */}
+            {/* In-shortlist indicator */}
             {inCart && (
-              <span className="absolute top-2 right-2 bg-[#E94560] text-white text-[9px] font-mono px-1.5 py-0.5 rounded">
-                In Cart
+              <span className="absolute top-2 right-2 bg-[#C8902A] text-[#020206] text-[9px] font-mono px-1.5 py-0.5 rounded">
+                In Shortlist
               </span>
             )}
           </div>
@@ -129,7 +129,7 @@ function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: n
         {/* Info */}
         <div className="p-3">
           <div className="flex items-start justify-between gap-2 mb-1.5">
-            <span className="font-mono text-xs text-[#E94560]">{item.item_code}</span>
+            <span className="font-mono text-xs text-[#C8902A]">{item.item_code}</span>
             <StatusDot status={item.status} />
           </div>
           <Link href={`/${categorySlug}/${item.item_code}`}>
@@ -156,14 +156,14 @@ function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: n
                 onClick={handleCartClick}
                 className={`ml-auto shrink-0 flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1.5 rounded transition-all ${
                   inCart
-                    ? 'bg-[#E94560]/10 border border-[#E94560]/30 text-[#E94560]'
-                    : 'bg-[#111118] border border-[#2A2A3A] text-[#8888A0] hover:border-[#E94560] hover:text-[#E94560]'
+                    ? 'bg-[#C8902A]/10 border border-[#C8902A]/30 text-[#C8902A]'
+                    : 'bg-[#111118] border border-[#2A2A3A] text-[#7070A0] hover:border-[#C8902A] hover:text-[#C8902A]'
                 }`}
               >
                 {inCart ? (
-                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M20 6 9 17l-5-5"/></svg>Added</>
+                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Shortlisted</>
                 ) : (
-                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24"><path d="M12 5v14M5 12h14"/></svg>Add to Cart</>
+                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add to Shortlist</>
                 )}
               </button>
             )}
@@ -201,7 +201,7 @@ export default function CategoryClient({ items, categorySlug, categoryName }: Pr
 
   const activeFilterCount = (materialFilter ? 1 : 0) + (colorFilter ? 1 : 0) + (availableOnly ? 1 : 0)
 
-  const selectCls = "bg-[#0D0D14] border border-[#2A2A3A] rounded-full px-4 py-2 text-sm text-[#D0D0E0] font-mono focus:outline-none focus:border-[#E94560] cursor-pointer transition-colors"
+  const selectCls = "bg-[#090910] border border-[#2A2A3A] rounded-full px-4 py-2 text-sm text-[#D0D0E0] font-mono focus:outline-none focus:border-[#C8902A] cursor-pointer transition-colors"
 
   return (
     <>
@@ -210,12 +210,12 @@ export default function CategoryClient({ items, categorySlug, categoryName }: Pr
         {/* Mobile toggle */}
         <button
           onClick={() => setShowFilters(v => !v)}
-          className="sm:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-[#2A2A3A] text-sm font-mono text-[#8888A0]"
+          className="sm:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-[#2A2A3A] text-sm font-mono text-[#7070A0]"
         >
           <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
             <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
           </svg>
-          Filters {activeFilterCount > 0 && <span className="bg-[#E94560] text-white text-[9px] px-1.5 rounded-full">{activeFilterCount}</span>}
+          Filters {activeFilterCount > 0 && <span className="bg-[#C8902A] text-white text-[9px] px-1.5 rounded-full">{activeFilterCount}</span>}
         </button>
 
         <div className={`${showFilters ? 'flex' : 'hidden'} sm:flex flex-wrap gap-2 w-full sm:w-auto`}>
@@ -234,7 +234,7 @@ export default function CategoryClient({ items, categorySlug, categoryName }: Pr
             className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-mono transition-colors ${
               availableOnly
                 ? 'border-green-500/60 text-green-400 bg-green-500/10'
-                : 'border-[#2A2A3A] text-[#8888A0] hover:border-[#8888A0]'
+                : 'border-[#2A2A3A] text-[#7070A0] hover:border-[#7070A0]'
             }`}
           >
             <span className={`w-1.5 h-1.5 rounded-full ${availableOnly ? 'bg-green-500' : 'bg-[#555568]'}`} />
@@ -244,7 +244,7 @@ export default function CategoryClient({ items, categorySlug, categoryName }: Pr
           {activeFilterCount > 0 && (
             <button
               onClick={() => { setMaterialFilter(''); setColorFilter(''); setAvailableOnly(false) }}
-              className="px-3 py-2 rounded-full text-xs font-mono text-[#E94560] hover:bg-[#E94560]/10 transition-colors"
+              className="px-3 py-2 rounded-full text-xs font-mono text-[#C8902A] hover:bg-[#C8902A]/10 transition-colors"
             >
               Clear ×
             </button>

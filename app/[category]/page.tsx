@@ -60,46 +60,46 @@ export default async function CategoryPage({ params }: Props) {
   const availableCount = items.filter(i => i.status === 'available').length
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F]">
+    <main className="min-h-screen bg-[#020206]">
       {/* Breadcrumb nav */}
-      <nav className="border-b border-[#1A1A2A] bg-[#0D0D14]">
+      <nav className="border-b border-[#1A1A2A] bg-[#090910]" aria-label="Breadcrumb">
         <div className="px-6 sm:px-10 py-4 max-w-7xl mx-auto flex items-center gap-2">
-          <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors uppercase tracking-[0.15em]">
+          <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors uppercase tracking-[0.15em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
             KGN
           </Link>
-          <span className="text-[#1A1A2A] font-mono">/</span>
-          <span className="font-mono text-xs text-[#D0D0E0]">{category.name}</span>
+          <span className="text-[#1A1A2A] font-mono" aria-hidden="true">/</span>
+          <span className="font-mono text-xs text-[#D0D0E0]" aria-current="page">{category.name}</span>
         </div>
       </nav>
 
       {/* Category header */}
-      <div className="px-6 sm:px-10 pt-12 pb-10 max-w-7xl mx-auto border-b border-[#1A1A2A]">
+      <header className="px-6 sm:px-10 pt-12 pb-10 max-w-7xl mx-auto border-b border-[#1A1A2A]">
         <div className="flex items-end justify-between gap-6">
           <div>
-            <p className="font-mono text-[10px] text-[#E94560] uppercase tracking-[0.25em] mb-3">Category</p>
+            <p className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.25em] mb-3">Prop Category</p>
             <h1 className="font-display text-[clamp(36px,6vw,80px)] font-light text-[#F0F0F5] leading-tight italic">
               {category.name}
             </h1>
           </div>
-          <div className="text-right shrink-0 pb-2">
+          <div className="text-right shrink-0 pb-2" aria-label="Inventory counts">
             <div className="font-display text-4xl font-light text-[#1E1E2E]">{category.item_count ?? items.length}</div>
-            <div className="font-mono text-[10px] text-[#333348] uppercase tracking-[0.2em]">Total Props</div>
-            <div className="font-mono text-[10px] text-green-600 mt-1">{availableCount} available</div>
+            <div className="font-mono text-[10px] text-[#333348] uppercase tracking-[0.2em]">Pieces Available</div>
+            <div className="font-mono text-[10px] text-green-600 mt-1">{availableCount} in stock</div>
           </div>
         </div>
-      </div>
+      </header>
 
       <div className="px-6 sm:px-10 py-10 max-w-7xl mx-auto">
         <CategoryClient items={items} categorySlug={slug} categoryName={category.name} />
       </div>
 
-      {/* Footer */}
+      {/* Footer strip */}
       <div className="border-t border-[#1A1A2A] px-6 sm:px-10 py-5 max-w-7xl mx-auto flex items-center justify-between">
-        <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#8888A0] transition-colors">
-          ← Back to All Categories
+        <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#7070A0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
+          ← All Categories
         </Link>
         <span className="font-mono text-xs text-[#333348]">{category.name} · KGN</span>
       </div>
-    </div>
+    </main>
   )
 }

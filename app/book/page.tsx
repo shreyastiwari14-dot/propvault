@@ -67,7 +67,7 @@ export default function BookPage() {
 
   if (success) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#020206] flex items-center justify-center px-6">
         <motion.div
           initial={{ opacity: 0, scale: 0.95 }}
           animate={{ opacity: 1, scale: 1 }}
@@ -79,18 +79,18 @@ export default function BookPage() {
             </svg>
           </div>
           <h1 className="font-display text-3xl font-light text-[#F0F0F5] italic mb-2">Booking Received</h1>
-          <p className="text-[#8888A0] text-sm mb-8">
+          <p className="text-[#7070A0] text-sm mb-8">
             We&apos;ll confirm your booking on WhatsApp or by phone within a few hours.
           </p>
           <div className="space-y-3">
-            <Link href="/" className="block w-full bg-[#E94560] hover:bg-[#d63a54] text-white font-semibold py-3.5 rounded-xl text-sm transition-colors text-center">
+            <Link href="/" className="block w-full bg-[#C8902A] hover:bg-[#B8801E] text-white font-semibold py-3.5 rounded-xl text-sm transition-colors text-center">
               Continue Browsing
             </Link>
             <a
               href={`https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '91XXXXXXXXXX'}?text=${encodeURIComponent('Hi, I just submitted a booking request on your website. Can you confirm?')}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 w-full border border-[#2A2A3A] hover:border-[#25D366] text-[#8888A0] hover:text-[#25D366] font-medium py-3.5 rounded-xl transition-colors text-sm"
+              className="flex items-center justify-center gap-2 w-full border border-[#2A2A3A] hover:border-[#25D366] text-[#7070A0] hover:text-[#25D366] font-medium py-3.5 rounded-xl transition-colors text-sm"
             >
               <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
@@ -105,22 +105,22 @@ export default function BookPage() {
 
   if (cart.length === 0) {
     return (
-      <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-6">
+      <div className="min-h-screen bg-[#020206] flex items-center justify-center px-6">
         <div className="text-center">
           <p className="font-display text-3xl font-light italic text-[#F0F0F5] mb-2">Your cart is empty</p>
-          <p className="text-[#8888A0] text-sm mb-8">Browse our catalogue to add props.</p>
-          <Link href="/" className="font-mono text-sm text-[#E94560] hover:underline">Browse Catalogue →</Link>
+          <p className="text-[#7070A0] text-sm mb-8">Browse our catalogue to add props.</p>
+          <Link href="/" className="font-mono text-sm text-[#C8902A] hover:underline">Browse Catalogue →</Link>
         </div>
       </div>
     )
   }
 
-  const inputCls = "w-full bg-[#0D0D14] border border-[#2A2A3A] rounded-xl px-4 py-3 text-[#F0F0F5] placeholder-[#333348] focus:outline-none focus:border-[#E94560] text-sm font-mono transition-colors"
+  const inputCls = "w-full bg-[#090910] border border-[#2A2A3A] rounded-xl px-4 py-3 text-[#F0F0F5] placeholder-[#333348] focus:outline-none focus:border-[#C8902A] text-sm font-mono transition-colors"
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F]">
+    <div className="min-h-screen bg-[#020206]">
       {/* Nav */}
-      <nav className="border-b border-[#1A1A2A] bg-[#0D0D14]">
+      <nav className="border-b border-[#1A1A2A] bg-[#090910]">
         <div className="px-6 sm:px-10 py-4 max-w-6xl mx-auto flex items-center gap-2">
           <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#F0F0F5] transition-colors uppercase tracking-[0.15em]">KGN</Link>
           <span className="text-[#1A1A2A]">/</span>
@@ -130,7 +130,7 @@ export default function BookPage() {
 
       <div className="px-6 sm:px-10 py-12 max-w-6xl mx-auto">
         <div className="mb-10">
-          <p className="font-mono text-[10px] text-[#E94560] uppercase tracking-[0.25em] mb-2">Your Booking</p>
+          <p className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.25em] mb-2">Your Booking</p>
           <h1 className="font-display text-[clamp(32px,5vw,60px)] font-light text-[#F0F0F5] italic">
             {cart.length} Prop{cart.length !== 1 ? 's' : ''} Selected
           </h1>
@@ -148,7 +148,7 @@ export default function BookPage() {
                     initial={{ opacity: 0, y: 12 }}
                     animate={{ opacity: 1, y: 0 }}
                     exit={{ opacity: 0, x: -20 }}
-                    className="flex gap-4 bg-[#0D0D14] border border-[#1A1A2A] rounded-xl p-4"
+                    className="flex gap-4 bg-[#090910] border border-[#1A1A2A] rounded-xl p-4"
                   >
                     <div className="w-20 h-20 relative rounded-lg overflow-hidden bg-[#111118] shrink-0">
                       {item.image_url ? (
@@ -160,10 +160,10 @@ export default function BookPage() {
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <div>
-                          <span className="font-mono text-xs text-[#E94560]">{item.item_code}</span>
+                          <span className="font-mono text-xs text-[#C8902A]">{item.item_code}</span>
                           <p className="text-sm text-[#D0D0E0] font-medium mt-0.5 line-clamp-1">{item.name}</p>
                         </div>
-                        <button onClick={() => removeFromCart(item.item_code)} className="text-[#555568] hover:text-[#E94560] transition-colors shrink-0">
+                        <button onClick={() => removeFromCart(item.item_code)} className="text-[#555568] hover:text-[#C8902A] transition-colors shrink-0">
                           <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
                             <path d="M18 6 6 18M6 6l12 12"/>
                           </svg>
@@ -175,13 +175,13 @@ export default function BookPage() {
                           <button
                             onClick={() => updateQty(item.item_code, item.quantity - 1)}
                             disabled={item.quantity <= 1}
-                            className="w-6 h-6 rounded-md border border-[#2A2A3A] text-[#8888A0] hover:border-[#8888A0] disabled:opacity-30 flex items-center justify-center text-sm transition-colors"
+                            className="w-6 h-6 rounded-md border border-[#2A2A3A] text-[#7070A0] hover:border-[#7070A0] disabled:opacity-30 flex items-center justify-center text-sm transition-colors"
                           >−</button>
                           <span className="font-mono text-sm text-[#F0F0F5] w-6 text-center">{item.quantity}</span>
                           <button
                             onClick={() => updateQty(item.item_code, item.quantity + 1)}
                             disabled={item.quantity >= item.max_qty}
-                            className="w-6 h-6 rounded-md border border-[#2A2A3A] text-[#8888A0] hover:border-[#8888A0] disabled:opacity-30 flex items-center justify-center text-sm transition-colors"
+                            className="w-6 h-6 rounded-md border border-[#2A2A3A] text-[#7070A0] hover:border-[#7070A0] disabled:opacity-30 flex items-center justify-center text-sm transition-colors"
                           >+</button>
                         </div>
                         <span className="font-mono text-[10px] text-[#333348]">max {item.max_qty}</span>
@@ -192,7 +192,7 @@ export default function BookPage() {
               </AnimatePresence>
             </div>
 
-            <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#8888A0] transition-colors">
+            <Link href="/" className="font-mono text-xs text-[#555568] hover:text-[#7070A0] transition-colors">
               + Add more props
             </Link>
           </div>
@@ -200,7 +200,7 @@ export default function BookPage() {
           {/* Right: Booking form */}
           <div>
             <form onSubmit={handleSubmit} className="space-y-4">
-              <div className="bg-[#0D0D14] border border-[#1A1A2A] rounded-2xl p-6">
+              <div className="bg-[#090910] border border-[#1A1A2A] rounded-2xl p-6">
                 <h2 className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em] mb-5">Your Details</h2>
 
                 <div className="space-y-3">
@@ -239,7 +239,7 @@ export default function BookPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0D0D14] border border-[#1A1A2A] rounded-2xl p-6">
+              <div className="bg-[#090910] border border-[#1A1A2A] rounded-2xl p-6">
                 <h2 className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em] mb-5">Dates</h2>
                 <div className="space-y-3">
                   <div>
@@ -268,7 +268,7 @@ export default function BookPage() {
                 </div>
               </div>
 
-              <div className="bg-[#0D0D14] border border-[#1A1A2A] rounded-2xl p-6">
+              <div className="bg-[#090910] border border-[#1A1A2A] rounded-2xl p-6">
                 <h2 className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.2em] mb-5">Additional Notes</h2>
                 <textarea
                   name="notes"
@@ -287,7 +287,7 @@ export default function BookPage() {
               <button
                 type="submit"
                 disabled={submitting}
-                className="w-full bg-[#E94560] hover:bg-[#d63a54] disabled:opacity-60 text-white font-semibold py-4 rounded-xl text-sm transition-colors"
+                className="w-full bg-[#C8902A] hover:bg-[#B8801E] disabled:opacity-60 text-white font-semibold py-4 rounded-xl text-sm transition-colors"
               >
                 {submitting ? 'Submitting...' : `Confirm Booking for ${cart.length} Prop${cart.length !== 1 ? 's' : ''}`}
               </button>

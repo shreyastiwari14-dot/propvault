@@ -59,7 +59,7 @@ export default function SearchBar() {
   return (
     <div className="relative w-full max-w-2xl">
       <div className="relative">
-        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#8888A0] pointer-events-none" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
+        <svg className="absolute left-3 top-1/2 -translate-y-1/2 text-[#7070A0] pointer-events-none" width="16" height="16" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
           <circle cx="11" cy="11" r="8"/><path d="m21 21-4.35-4.35"/>
         </svg>
         <input
@@ -69,17 +69,17 @@ export default function SearchBar() {
           onFocus={() => results.length > 0 && setOpen(true)}
           onBlur={() => setTimeout(() => setOpen(false), 150)}
           placeholder="Search by item code, name, material, color…"
-          className="w-full bg-[#111118] border border-[#2A2A3A] rounded-lg pl-9 pr-10 py-3 text-[#F0F0F5] placeholder-[#8888A0] text-sm focus:outline-none focus:border-[#E94560] font-mono transition-colors"
+          className="w-full bg-[#111118] border border-[#2A2A3A] rounded-lg pl-9 pr-10 py-3 text-[#F0F0F5] placeholder-[#7070A0] text-sm focus:outline-none focus:border-[#C8902A] font-mono transition-colors"
         />
         {loading && (
           <div className="absolute right-3 top-1/2 -translate-y-1/2">
-            <div className="w-4 h-4 border border-[#2A2A3A] border-t-[#E94560] rounded-full animate-spin" />
+            <div className="w-4 h-4 border border-[#2A2A3A] border-t-[#C8902A] rounded-full animate-spin" />
           </div>
         )}
         {!loading && query && (
           <button
             onMouseDown={clear}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#8888A0] hover:text-[#F0F0F5]"
+            className="absolute right-3 top-1/2 -translate-y-1/2 text-[#7070A0] hover:text-[#F0F0F5]"
           >
             <svg width="14" height="14" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24"><path d="M18 6 6 18M6 6l12 12"/></svg>
           </button>
@@ -95,15 +95,15 @@ export default function SearchBar() {
               onMouseDown={clear}
               className="flex items-center gap-3 px-4 py-2.5 hover:bg-[#1A1A24] border-b border-[#2A2A3A] last:border-0 transition-colors"
             >
-              <span className="font-mono text-xs text-[#E94560] w-16 shrink-0">{item.item_code}</span>
+              <span className="font-mono text-xs text-[#C8902A] w-16 shrink-0">{item.item_code}</span>
               <span className="text-sm text-[#F0F0F5] flex-1 truncate">{item.name}</span>
-              {item.material && <span className="text-xs text-[#8888A0] shrink-0 hidden sm:block">{item.material}</span>}
-              {item.category && <span className="text-xs text-[#8888A0] shrink-0 hidden md:block">{item.category.name}</span>}
+              {item.material && <span className="text-xs text-[#7070A0] shrink-0 hidden sm:block">{item.material}</span>}
+              {item.category && <span className="text-xs text-[#7070A0] shrink-0 hidden md:block">{item.category.name}</span>}
               <span className={`w-2 h-2 rounded-full shrink-0 ${statusDot(item.status)}`} />
             </Link>
           ))}
           {results.length > 8 && (
-            <div className="px-4 py-2 text-xs text-[#8888A0] font-mono bg-[#0A0A0F]">
+            <div className="px-4 py-2 text-xs text-[#7070A0] font-mono bg-[#020206]">
               {results.length - 8} more — refine your search
             </div>
           )}
@@ -112,7 +112,7 @@ export default function SearchBar() {
 
       {open && query.length >= 2 && !loading && results.length === 0 && (
         <div className="absolute top-full left-0 right-0 mt-1 bg-[#111118] border border-[#2A2A3A] rounded-lg z-50 shadow-xl">
-          <div className="px-4 py-3 text-sm text-[#8888A0] font-mono">No items found for &ldquo;{query}&rdquo;</div>
+          <div className="px-4 py-3 text-sm text-[#7070A0] font-mono">No items found for &ldquo;{query}&rdquo;</div>
         </div>
       )}
     </div>

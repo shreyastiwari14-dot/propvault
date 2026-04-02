@@ -60,11 +60,11 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
   }
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F] flex items-center justify-center px-4">
+    <div className="min-h-screen bg-[#020206] flex items-center justify-center px-4">
       <form onSubmit={submit} className="w-full max-w-sm space-y-4">
         <div className="text-center mb-6">
           <h1 className="text-xl font-bold text-[#F0F0F5]">KGN Admin</h1>
-          <p className="text-[#8888A0] text-sm mt-1 font-mono">Enter password to continue</p>
+          <p className="text-[#7070A0] text-sm mt-1 font-mono">Enter password to continue</p>
         </div>
         <input
           type="password"
@@ -72,13 +72,13 @@ function LoginScreen({ onLogin }: { onLogin: () => void }) {
           onChange={e => setPw(e.target.value)}
           placeholder="Password"
           autoFocus
-          className="w-full bg-[#111118] border border-[#2A2A3A] rounded-lg px-4 py-3 text-[#F0F0F5] placeholder-[#8888A0] focus:outline-none focus:border-[#E94560] font-mono"
+          className="w-full bg-[#111118] border border-[#2A2A3A] rounded-lg px-4 py-3 text-[#F0F0F5] placeholder-[#7070A0] focus:outline-none focus:border-[#C8902A] font-mono"
         />
         {error && <p className="text-xs text-red-400 font-mono">{error}</p>}
         <button
           type="submit"
           disabled={loading || !pw}
-          className="w-full bg-[#E94560] hover:bg-[#C73350] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors"
+          className="w-full bg-[#C8902A] hover:bg-[#C73350] disabled:opacity-50 text-white font-medium py-3 rounded-lg transition-colors"
         >
           {loading ? 'Checking…' : 'Sign In'}
         </button>
@@ -106,20 +106,20 @@ function DashboardTab({ bookings, payments }: { bookings: Booking[]; payments: P
           { label: 'Outstanding (₹)', value: stats.pendingAmount.toLocaleString('en-IN') },
         ].map(s => (
           <div key={s.label} className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-4">
-            <div className="text-xs font-mono text-[#8888A0] uppercase tracking-wide mb-1">{s.label}</div>
-            <div className={`font-mono text-2xl font-bold ${s.accent ? 'text-[#E94560]' : 'text-[#F0F0F5]'}`}>{s.value}</div>
+            <div className="text-xs font-mono text-[#7070A0] uppercase tracking-wide mb-1">{s.label}</div>
+            <div className={`font-mono text-2xl font-bold ${s.accent ? 'text-[#C8902A]' : 'text-[#F0F0F5]'}`}>{s.value}</div>
           </div>
         ))}
       </div>
 
       <div>
-        <h2 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest mb-3">Recent Bookings</h2>
+        <h2 className="text-xs font-mono text-[#7070A0] uppercase tracking-widest mb-3">Recent Bookings</h2>
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg overflow-x-auto">
           <table className="w-full min-w-[600px]">
             <thead>
               <tr className="border-b border-[#2A2A3A]">
                 {['Item', 'Booker', 'Phone', 'Date', 'Status'].map(h => (
-                  <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#8888A0] uppercase tracking-wide">{h}</th>
+                  <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#7070A0] uppercase tracking-wide">{h}</th>
                 ))}
               </tr>
             </thead>
@@ -134,7 +134,7 @@ function DashboardTab({ bookings, payments }: { bookings: Booking[]; payments: P
                 </tr>
               ))}
               {bookings.length === 0 && (
-                <tr><td colSpan={5} className="px-3 py-8 text-center text-xs font-mono text-[#8888A0]">No bookings yet</td></tr>
+                <tr><td colSpan={5} className="px-3 py-8 text-center text-xs font-mono text-[#7070A0]">No bookings yet</td></tr>
               )}
             </tbody>
           </table>
@@ -163,7 +163,7 @@ function BookingsTab({ bookings, onUpdate }: { bookings: Booking[]; onUpdate: ()
         <thead>
           <tr className="border-b border-[#2A2A3A]">
             {['Item', 'Booker', 'Phone', 'Production', 'Dates', 'Qty', 'Status', 'Action'].map(h => (
-              <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#8888A0] uppercase tracking-wide">{h}</th>
+              <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#7070A0] uppercase tracking-wide">{h}</th>
             ))}
           </tr>
         </thead>
@@ -182,7 +182,7 @@ function BookingsTab({ bookings, onUpdate }: { bookings: Booking[]; onUpdate: ()
                   value={b.status}
                   onChange={e => updateStatus(b.id, e.target.value)}
                   disabled={updating === b.id}
-                  className="bg-[#0A0A0F] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none focus:border-[#E94560] disabled:opacity-50"
+                  className="bg-[#020206] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none focus:border-[#C8902A] disabled:opacity-50"
                 >
                   {statusOptions.map(s => <option key={s} value={s}>{s}</option>)}
                 </select>
@@ -190,7 +190,7 @@ function BookingsTab({ bookings, onUpdate }: { bookings: Booking[]; onUpdate: ()
             </tr>
           ))}
           {bookings.length === 0 && (
-            <tr><td colSpan={8} className="px-3 py-8 text-center text-xs font-mono text-[#8888A0]">No bookings yet</td></tr>
+            <tr><td colSpan={8} className="px-3 py-8 text-center text-xs font-mono text-[#7070A0]">No bookings yet</td></tr>
           )}
         </tbody>
       </table>
@@ -220,7 +220,7 @@ function InventoryTab({ onRefresh }: { onRefresh: () => void }) {
     fetch('/api/search?q=a').then(r => r.json()).then(d => setItems(d.items ?? []))
   }
 
-  if (loading) return <div className="py-16 text-center text-xs font-mono text-[#8888A0]">Loading inventory…</div>
+  if (loading) return <div className="py-16 text-center text-xs font-mono text-[#7070A0]">Loading inventory…</div>
 
   return (
     <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg overflow-x-auto">
@@ -228,7 +228,7 @@ function InventoryTab({ onRefresh }: { onRefresh: () => void }) {
         <thead>
           <tr className="border-b border-[#2A2A3A]">
             {['Code', 'Name', 'Material', 'Status', 'Avail / Total', 'Actions'].map(h => (
-              <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#8888A0] uppercase tracking-wide">{h}</th>
+              <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#7070A0] uppercase tracking-wide">{h}</th>
             ))}
           </tr>
         </thead>
@@ -246,7 +246,7 @@ function InventoryTab({ onRefresh }: { onRefresh: () => void }) {
                     value={item.status}
                     onChange={e => updateItem(item.item_code, { status: e.target.value })}
                     disabled={updating === item.item_code}
-                    className="bg-[#0A0A0F] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none disabled:opacity-50"
+                    className="bg-[#020206] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none disabled:opacity-50"
                   >
                     {['available', 'booked', 'maintenance', 'unavailable'].map(s => <option key={s} value={s}>{s}</option>)}
                   </select>
@@ -259,14 +259,14 @@ function InventoryTab({ onRefresh }: { onRefresh: () => void }) {
                       const v = parseInt(e.target.value)
                       if (!isNaN(v) && v !== item.quantity_available) updateItem(item.item_code, { quantity_available: v })
                     }}
-                    className="w-14 bg-[#0A0A0F] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none"
+                    className="w-14 bg-[#020206] border border-[#2A2A3A] rounded px-2 py-1 text-xs font-mono text-[#F0F0F5] focus:outline-none"
                   />
                 </div>
               </td>
             </tr>
           ))}
           {items.length === 0 && (
-            <tr><td colSpan={6} className="px-3 py-8 text-center text-xs font-mono text-[#8888A0]">No items found. Run the seed script first.</td></tr>
+            <tr><td colSpan={6} className="px-3 py-8 text-center text-xs font-mono text-[#7070A0]">No items found. Run the seed script first.</td></tr>
           )}
         </tbody>
       </table>
@@ -298,58 +298,58 @@ function PaymentsTab({ payments, bookings, onUpdate }: { payments: Payment[]; bo
       {/* Summary */}
       <div className="grid grid-cols-2 gap-3">
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-4">
-          <div className="text-xs font-mono text-[#8888A0] uppercase tracking-wide mb-1">Total Billed</div>
+          <div className="text-xs font-mono text-[#7070A0] uppercase tracking-wide mb-1">Total Billed</div>
           <div className="font-mono text-xl font-bold text-[#F0F0F5]">₹{total.toLocaleString('en-IN')}</div>
         </div>
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-4">
-          <div className="text-xs font-mono text-[#8888A0] uppercase tracking-wide mb-1">Outstanding</div>
-          <div className="font-mono text-xl font-bold text-[#E94560]">₹{outstanding.toLocaleString('en-IN')}</div>
+          <div className="text-xs font-mono text-[#7070A0] uppercase tracking-wide mb-1">Outstanding</div>
+          <div className="font-mono text-xl font-bold text-[#C8902A]">₹{outstanding.toLocaleString('en-IN')}</div>
         </div>
       </div>
 
       {/* Add payment */}
       {!adding ? (
-        <button onClick={() => setAdding(true)} className="text-xs font-mono text-[#E94560] hover:text-[#F0F0F5] transition-colors">
+        <button onClick={() => setAdding(true)} className="text-xs font-mono text-[#C8902A] hover:text-[#F0F0F5] transition-colors">
           + Add Payment
         </button>
       ) : (
         <form onSubmit={submit} className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-4 space-y-3">
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1">Booking</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1">Booking</label>
               <select
                 value={form.booking_id}
                 onChange={e => setForm(f => ({ ...f, booking_id: e.target.value }))}
                 required
-                className="w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none"
+                className="w-full bg-[#020206] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none"
               >
                 <option value="">Select booking…</option>
                 {bookings.map(b => <option key={b.id} value={b.id}>{b.item?.item_code} — {b.booker_name}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1">Amount (₹)</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1">Amount (₹)</label>
               <input type="number" value={form.amount} onChange={e => setForm(f => ({ ...f, amount: e.target.value }))} required min="0" step="0.01"
-                className="w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none" />
+                className="w-full bg-[#020206] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none" />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1">Status</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1">Status</label>
               <select value={form.status} onChange={e => setForm(f => ({ ...f, status: e.target.value }))}
-                className="w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none">
+                className="w-full bg-[#020206] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none">
                 {['pending', 'paid', 'partial', 'overdue'].map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1">Due Date</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1">Due Date</label>
               <input type="date" value={form.due_date} onChange={e => setForm(f => ({ ...f, due_date: e.target.value }))}
-                className="w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none" />
+                className="w-full bg-[#020206] border border-[#2A2A3A] rounded px-3 py-2 text-xs font-mono text-[#F0F0F5] focus:outline-none" />
             </div>
           </div>
           <div className="flex gap-2 pt-1">
-            <button type="submit" disabled={saving} className="bg-[#E94560] hover:bg-[#C73350] disabled:opacity-50 text-white text-xs font-mono px-4 py-2 rounded transition-colors">
+            <button type="submit" disabled={saving} className="bg-[#C8902A] hover:bg-[#C73350] disabled:opacity-50 text-white text-xs font-mono px-4 py-2 rounded transition-colors">
               {saving ? 'Saving…' : 'Save'}
             </button>
-            <button type="button" onClick={() => setAdding(false)} className="text-xs font-mono text-[#8888A0] px-4 py-2">Cancel</button>
+            <button type="button" onClick={() => setAdding(false)} className="text-xs font-mono text-[#7070A0] px-4 py-2">Cancel</button>
           </div>
         </form>
       )}
@@ -360,7 +360,7 @@ function PaymentsTab({ payments, bookings, onUpdate }: { payments: Payment[]; bo
           <thead>
             <tr className="border-b border-[#2A2A3A]">
               {['Booking', 'Amount', 'Status', 'Due Date', 'Notes'].map(h => (
-                <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#8888A0] uppercase tracking-wide">{h}</th>
+                <th key={h} className="px-3 py-2 text-left text-xs font-mono text-[#7070A0] uppercase tracking-wide">{h}</th>
               ))}
             </tr>
           </thead>
@@ -375,7 +375,7 @@ function PaymentsTab({ payments, bookings, onUpdate }: { payments: Payment[]; bo
               </tr>
             ))}
             {payments.length === 0 && (
-              <tr><td colSpan={5} className="px-3 py-8 text-center text-xs font-mono text-[#8888A0]">No payments yet</td></tr>
+              <tr><td colSpan={5} className="px-3 py-8 text-center text-xs font-mono text-[#7070A0]">No payments yet</td></tr>
             )}
           </tbody>
         </table>
@@ -449,7 +449,7 @@ function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
     onSuccess()
   }
 
-  const inputCls = "w-full bg-[#0A0A0F] border border-[#2A2A3A] rounded px-3 py-2 text-sm text-[#F0F0F5] font-mono focus:outline-none focus:border-[#E94560] transition-colors placeholder-[#555568]"
+  const inputCls = "w-full bg-[#020206] border border-[#2A2A3A] rounded px-3 py-2 text-sm text-[#F0F0F5] font-mono focus:outline-none focus:border-[#C8902A] transition-colors placeholder-[#555568]"
 
   return (
     <div className="max-w-2xl">
@@ -463,56 +463,56 @@ function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
       <form onSubmit={handleSubmit} className="space-y-6">
         {/* Category + Code */}
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
-          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Identity</h3>
+          <h3 className="text-xs font-mono text-[#7070A0] uppercase tracking-widest">Identity</h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Category *</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Category *</label>
               <select name="category_id" value={form.category_id} onChange={handleChange} required className={inputCls}>
                 <option value="">Select category…</option>
                 {categories.map(c => <option key={c.id} value={c.id}>{c.name}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Item Code * (e.g. CH-105)</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Item Code * (e.g. CH-105)</label>
               <input name="item_code" value={form.item_code} onChange={handleChange} placeholder="CH-105" required className={inputCls} />
             </div>
           </div>
           <div>
-            <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Name *</label>
+            <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Name *</label>
             <input name="name" value={form.name} onChange={handleChange} placeholder="e.g. Tufted Wingback Armchair" required className={inputCls} />
           </div>
           <div>
-            <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Description</label>
+            <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Description</label>
             <textarea name="description" value={form.description} onChange={handleChange} placeholder="Short description (optional)" rows={2} className={`${inputCls} resize-none`} />
           </div>
         </div>
 
         {/* Details */}
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
-          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Details</h3>
+          <h3 className="text-xs font-mono text-[#7070A0] uppercase tracking-widest">Details</h3>
           <div className="grid grid-cols-2 gap-3">
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Material</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Material</label>
               <input name="material" value={form.material} onChange={handleChange} placeholder="e.g. Teak Wood" className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Color</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Color</label>
               <input name="color" value={form.color} onChange={handleChange} placeholder="e.g. Dark Brown" className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Height</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Height</label>
               <input name="height" value={form.height} onChange={handleChange} placeholder='e.g. 36"' className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Width</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Width</label>
               <input name="width" value={form.width} onChange={handleChange} placeholder='e.g. 24"' className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Depth / Length</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Depth / Length</label>
               <input name="depth" value={form.depth} onChange={handleChange} placeholder='e.g. 20"' className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Style</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Style</label>
               <input name="style" value={form.style} onChange={handleChange} placeholder="e.g. Victorian" className={inputCls} />
             </div>
           </div>
@@ -520,20 +520,20 @@ function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
 
         {/* Inventory */}
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-4">
-          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Inventory</h3>
+          <h3 className="text-xs font-mono text-[#7070A0] uppercase tracking-widest">Inventory</h3>
           <div className="grid grid-cols-3 gap-3">
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Status</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Status</label>
               <select name="status" value={form.status} onChange={handleChange} className={inputCls}>
                 {['available', 'booked', 'maintenance', 'unavailable'].map(s => <option key={s} value={s}>{s}</option>)}
               </select>
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Available Qty</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Available Qty</label>
               <input name="quantity_available" type="number" min="0" value={form.quantity_available} onChange={handleChange} className={inputCls} />
             </div>
             <div>
-              <label className="text-xs font-mono text-[#8888A0] block mb-1.5">Total Qty</label>
+              <label className="text-xs font-mono text-[#7070A0] block mb-1.5">Total Qty</label>
               <input name="quantity_total" type="number" min="1" value={form.quantity_total} onChange={handleChange} className={inputCls} />
             </div>
           </div>
@@ -541,8 +541,8 @@ function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
 
         {/* Image Upload */}
         <div className="bg-[#111118] border border-[#2A2A3A] rounded-lg p-5 space-y-3">
-          <h3 className="text-xs font-mono text-[#8888A0] uppercase tracking-widest">Image</h3>
-          <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#2A2A3A] hover:border-[#E94560] rounded-lg p-6 cursor-pointer transition-colors">
+          <h3 className="text-xs font-mono text-[#7070A0] uppercase tracking-widest">Image</h3>
+          <label className="flex flex-col items-center justify-center border-2 border-dashed border-[#2A2A3A] hover:border-[#C8902A] rounded-lg p-6 cursor-pointer transition-colors">
             {imagePreview ? (
               // eslint-disable-next-line @next/next/no-img-element
               <img src={imagePreview} alt="preview" className="max-h-40 object-contain rounded" />
@@ -557,13 +557,13 @@ function AddPropTab({ onSuccess }: { onSuccess: () => void }) {
             <input type="file" accept="image/*" onChange={handleImage} className="hidden" />
           </label>
           {imageFile && (
-            <button type="button" onClick={() => { setImageFile(null); setImagePreview(null) }} className="text-xs font-mono text-[#E94560]">Remove image</button>
+            <button type="button" onClick={() => { setImageFile(null); setImagePreview(null) }} className="text-xs font-mono text-[#C8902A]">Remove image</button>
           )}
         </div>
 
         {error && <p className="text-xs text-red-400 font-mono">{error}</p>}
 
-        <button type="submit" disabled={saving} className="w-full bg-[#E94560] hover:bg-[#C73350] disabled:opacity-50 text-white font-medium py-3 rounded-lg text-sm transition-colors">
+        <button type="submit" disabled={saving} className="w-full bg-[#C8902A] hover:bg-[#C73350] disabled:opacity-50 text-white font-medium py-3 rounded-lg text-sm transition-colors">
           {saving ? 'Adding Prop…' : 'Add Prop to Catalogue'}
         </button>
       </form>
@@ -600,7 +600,7 @@ export default function AdminPage() {
 
   const logout = () => { sessionStorage.removeItem('kgn_admin_auth'); setAuthed(false) }
 
-  if (checking) return <div className="min-h-screen bg-[#0A0A0F]" />
+  if (checking) return <div className="min-h-screen bg-[#020206]" />
   if (!authed) return <LoginScreen onLogin={() => setAuthed(true)} />
 
   const tabs = [
@@ -612,7 +612,7 @@ export default function AdminPage() {
   ] as const
 
   return (
-    <div className="min-h-screen bg-[#0A0A0F]">
+    <div className="min-h-screen bg-[#020206]">
       {/* Header */}
       <div className="border-b border-[#2A2A3A] bg-[#111118]">
         <div className="px-4 sm:px-6 py-3 max-w-7xl mx-auto flex items-center justify-between">
@@ -627,8 +627,8 @@ export default function AdminPage() {
                     tab === t.id
                       ? 'bg-[#1A1A24] text-[#F0F0F5]'
                       : t.id === 'add'
-                      ? 'text-[#E94560] hover:text-[#F0F0F5]'
-                      : 'text-[#8888A0] hover:text-[#F0F0F5]'
+                      ? 'text-[#C8902A] hover:text-[#F0F0F5]'
+                      : 'text-[#7070A0] hover:text-[#F0F0F5]'
                   }`}
                 >
                   {t.label}
@@ -637,9 +637,9 @@ export default function AdminPage() {
             </nav>
           </div>
           <div className="flex items-center gap-3">
-            {loading && <span className="text-xs font-mono text-[#8888A0]">Loading…</span>}
-            <button onClick={fetchData} className="text-xs font-mono text-[#8888A0] hover:text-[#F0F0F5] transition-colors">↻ Refresh</button>
-            <button onClick={logout} className="text-xs font-mono text-[#8888A0] hover:text-[#E94560] transition-colors">Sign out</button>
+            {loading && <span className="text-xs font-mono text-[#7070A0]">Loading…</span>}
+            <button onClick={fetchData} className="text-xs font-mono text-[#7070A0] hover:text-[#F0F0F5] transition-colors">↻ Refresh</button>
+            <button onClick={logout} className="text-xs font-mono text-[#7070A0] hover:text-[#C8902A] transition-colors">Sign out</button>
           </div>
         </div>
       </div>
