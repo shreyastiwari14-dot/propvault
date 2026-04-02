@@ -122,20 +122,19 @@ function HeroSection({ totalItems }: { totalItems: number }) {
       ref={ref}
       className="relative min-h-[100svh] flex flex-col justify-center overflow-hidden"
     >
-      {/* Animated background with parallax */}
-      <motion.div className="absolute inset-0" style={{ y: bgY }}>
-        <div className="absolute inset-0 bg-gradient-to-br from-[#06060a] via-[#0a0a16] to-[#06060a]" />
-        <div className="absolute top-0 right-0 w-[70%] h-[70%] bg-[radial-gradient(ellipse_at_top_right,rgba(0,212,177,0.07),transparent_60%)]" />
-        <div className="absolute bottom-0 left-0 w-[50%] h-[50%] bg-[radial-gradient(ellipse_at_bottom_left,rgba(240,104,48,0.04),transparent_60%)]" />
-        {/* Grid pattern overlay */}
-        <div
-          className="absolute inset-0 opacity-[0.03]"
-          style={{
-            backgroundImage:
-              "linear-gradient(rgba(255,255,255,0.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,0.1) 1px, transparent 1px)",
-            backgroundSize: "60px 60px",
-          }}
+      {/* Hero image with parallax */}
+      <motion.div className="absolute inset-0 scale-110" style={{ y: bgY }}>
+        <Image
+          src="https://oymcvzzfgmhaafnmizks.supabase.co/storage/v1/object/public/prop-images/hero/IMG_2802.jpeg"
+          alt="KGN Props — vintage Indian set"
+          fill
+          priority
+          className="object-cover object-center"
+          sizes="100vw"
         />
+        {/* Dark overlay for text legibility */}
+        <div className="absolute inset-0 bg-[#05050a]/70" />
+        <div className="absolute inset-0 bg-gradient-to-t from-[#05050a] via-transparent to-transparent" />
       </motion.div>
 
       {/* Content with scroll fade */}
