@@ -1,41 +1,47 @@
-import { createClient } from '@/lib/supabase/server'
-import HomeClient from './HomeClient'
+import { createClient } from "@/lib/supabase/server";
+import HomeClient from "./HomeClient";
 
 export const metadata = {
-  title: 'KGN Furniture and Props — Film & Production',
-  description: 'Browse and book premium furniture and props for film, OTT and commercial productions in Mumbai.',
-}
+  title: "KGN Furniture & Props — Film & Production",
+  description:
+    "Browse and book premium furniture and props for film, OTT and commercial productions in Mumbai.",
+};
 
 export default async function HomePage() {
-  const supabase = createClient()
+  const supabase = await createClient();
 
+  // Fetch categories
   const { data: categories } = await supabase
-    .from('categories')
-    .select('id, name, slug, item_count')
-    .order('display_order')
+    .from("categories")
+    .select("id, name, slug, item_count")
+    .order("display_order");
 
-  const thumbnails: Record<string, string | null> = {}
-  if (categories?.length) {
-    await Promise.all(
-      categories.map(async (cat) => {
-        const { data } = await supabase
-          .from('item_images')
-          .select('image_url, item:items!inner(category_id)')
-          .eq('item.category_id', cat.id)
-          .eq('is_primary', true)
-          .limit(1)
-          .maybeSingle()
-        if (data?.image_url) thumbnails[cat.id] = data.image_url
-      })
-    )
-  }
+  // Get thumbnail for each category (first primary image)
+  const categoryData = await Promise.all(
+    (categories || []).map(async (cat) => {
+      const { data: items } = await supabase
+        .from("items")
+        .select("id, item_images(image_url, is_primary)")
+        .eq("category_id", cat.id)
+        .limit(1);
 
-  const totalItems = categories?.reduce((sum, c) => sum + (c.item_count ?? 0), 0) ?? 0
+      let thumbnail: string | null = null;
+      if (items && items[0]) {
+        const images = (items[0] as any).item_images;
+        if (Array.isArray(images) && images.length > 0) {
+          const primary = images.find((img: any) => img.is_primary);
+          thumbnail = primary?.image_url || images[0]?.image_url || null;
+        }
+      }
 
-  const categoryData = (categories ?? []).map(cat => ({
-    ...cat,
-    thumbnail: thumbnails[cat.id] ?? null,
-  }))
+      return { ...cat, thumbnail };
+    })
+  );
 
-  return <HomeClient categories={categoryData} totalItems={totalItems} />
+  const totalItems = (categories || []).reduce(
+    (sum, cat) => sum + (cat.item_count || 0),
+    0
+  );
+
+  return <HomeClient categoryData={categoryData} totalItems={totalItems} />;
 }

@@ -1,485 +1,593 @@
-'use client'
-import { motion, useScroll, useTransform, useInView } from 'framer-motion'
-import { useRef, useEffect, useState } from 'react'
-import Image from 'next/image'
-import Link from 'next/link'
-import { WHATSAPP_BASE_URL } from '@/lib/config'
+"use client";
 
-interface Category {
-  id: string
-  name: string
-  slug: string
-  item_count: number | null
-  thumbnail: string | null
+import { useState, useEffect, useRef } from "react";
+import { motion, useInView, AnimatePresence } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+
+/* ── Types ── */
+interface CategoryData {
+  id: string;
+  name: string;
+  slug: string;
+  item_count: number;
+  thumbnail: string | null;
 }
 
-const EASE_EXPO = [0.76, 0, 0.24, 1] as [number, number, number, number]
-const EASE_OUT  = [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
+interface HomeClientProps {
+  categoryData: CategoryData[];
+  totalItems: number;
+}
 
-/* ── Animated counter ── */
-function Count({ to, suffix = '' }: { to: number; suffix?: string }) {
-  const [val, setVal] = useState(0)
-  const ref    = useRef<HTMLSpanElement>(null)
-  const inView = useInView(ref, { once: true })
+/* ── Animation Presets ── */
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+const fadeUp = {
+  hidden: { opacity: 0, y: 28 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.7, ease: EASE, delay: i * 0.08 },
+  }),
+};
+
+const scaleIn = {
+  hidden: { opacity: 0, scale: 0.96 },
+  visible: (i: number = 0) => ({
+    opacity: 1,
+    scale: 1,
+    transition: { duration: 0.5, ease: EASE, delay: i * 0.05 },
+  }),
+};
+
+/* ── Animated Counter ── */
+function Counter({ target, suffix = "" }: { target: number; suffix?: string }) {
+  const [count, setCount] = useState(0);
+  const ref = useRef<HTMLSpanElement>(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
 
   useEffect(() => {
-    if (!inView || to === 0) return
-    let raf: number
-    const start = performance.now()
-    const dur   = 1800
-    const tick  = (now: number) => {
-      const p    = Math.min((now - start) / dur, 1)
-      const ease = 1 - Math.pow(1 - p, 3)
-      setVal(Math.round(ease * to))
-      if (p < 1) raf = requestAnimationFrame(tick)
+    if (!inView) return;
+    let start = 0;
+    const duration = 1800;
+    const startTime = performance.now();
+
+    function animate(now: number) {
+      const elapsed = now - startTime;
+      const progress = Math.min(elapsed / duration, 1);
+      // ease-out cubic
+      const eased = 1 - Math.pow(1 - progress, 3);
+      setCount(Math.floor(eased * target));
+      if (progress < 1) requestAnimationFrame(animate);
     }
-    raf = requestAnimationFrame(tick)
-    return () => cancelAnimationFrame(raf)
-  }, [inView, to])
-
-  return <span ref={ref}>{val > 0 ? val.toLocaleString() : to.toLocaleString()}{suffix}</span>
-}
-
-/* ── WhatsApp icon ── */
-const WaIcon = ({ size = 16 }: { size?: number }) => (
-  <svg width={size} height={size} viewBox="0 0 24 24" fill="currentColor" aria-hidden="true">
-    <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 0 1-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 0 1-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 0 1 2.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884m8.413-18.297A11.815 11.815 0 0 0 12.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 0 0 5.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 0 0-3.48-8.413Z"/>
-  </svg>
-)
-
-/* ── Bento category tile ── */
-function CatTile({ cat, index }: { cat: Category; index: number }) {
-  // Grid span logic for bento layout
-  const getGridClass = (i: number) => {
-    if (i === 0) return 'sm:col-span-3 sm:row-span-2'
-    if (i === 1) return 'sm:col-span-3 sm:row-span-2'
-    return 'sm:col-span-2'
-  }
+    requestAnimationFrame(animate);
+  }, [inView, target]);
 
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 40 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: '100px' }}
-      transition={{ duration: 0.6, delay: index * 0.05, ease: EASE_EXPO }}
-      className={getGridClass(index)}
-    >
-      <Link
-        href={`/${cat.slug}`}
-        data-cursor="view"
-        className={`group relative flex overflow-hidden rounded-xl bg-[#0a0a0f] border border-white/[0.06] hover:border-[#00e5c7]/30 transition-all duration-500 h-full ${
-          index < 2 ? 'min-h-[300px] sm:min-h-0' : 'min-h-[200px]'
-        }`}
+    <span ref={ref} className="tabular-nums">
+      {count}
+      {suffix}
+    </span>
+  );
+}
+
+/* ── WhatsApp Helper ── */
+const WA_NUMBER = "919999999999";
+const waLink = (msg?: string) =>
+  `https://wa.me/${WA_NUMBER}?text=${encodeURIComponent(
+    msg || "Hi, I'd like to know more about your prop collection."
+  )}`;
+
+/* ══════════════════════════════════════════
+   HOMEPAGE
+   ══════════════════════════════════════════ */
+export default function HomeClient({ categoryData, totalItems }: HomeClientProps) {
+  return (
+    <main className="min-h-screen">
+      {/* ── HERO ── */}
+      <HeroSection totalItems={totalItems} />
+
+      {/* ── MARQUEE ── */}
+      <MarqueeBand />
+
+      {/* ── CATEGORIES ── */}
+      <CategoriesSection categories={categoryData} />
+
+      {/* ── STATS ── */}
+      <StatsSection totalItems={totalItems} categoryCount={categoryData.length} />
+
+      {/* ── ABOUT ── */}
+      <AboutSection />
+
+      {/* ── CTA ── */}
+      <CTASection />
+
+      {/* ── FOOTER ── */}
+      <Footer />
+
+      {/* ── WHATSAPP FAB ── */}
+      <WhatsAppFab />
+    </main>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   HERO SECTION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function HeroSection({ totalItems }: { totalItems: number }) {
+  return (
+    <section className="relative min-h-[100svh] flex flex-col justify-center px-6 md:px-12 lg:px-20 xl:px-28 overflow-hidden">
+      {/* Background gradient */}
+      <div className="absolute inset-0 bg-gradient-to-br from-[#06060a] via-[#0a0a16] to-[#06060a]" />
+      <div className="absolute top-0 right-0 w-[60%] h-[60%] bg-[radial-gradient(ellipse_at_top_right,rgba(0,212,177,0.06),transparent_70%)]" />
+      <div className="absolute bottom-0 left-0 w-[40%] h-[40%] bg-[radial-gradient(ellipse_at_bottom_left,rgba(240,104,48,0.04),transparent_70%)]" />
+
+      <div className="relative z-10 max-w-[1400px] mx-auto w-full">
+        {/* Eyebrow */}
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={0}
+          className="font-mono text-xs md:text-sm tracking-[0.2em] uppercase text-[#00d4b1] mb-5 md:mb-6"
+        >
+          Mumbai&apos;s Premier Prop House
+        </motion.p>
+
+        {/* Headline */}
+        <motion.h1
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={1}
+          className="font-display font-bold text-[clamp(2.5rem,7vw,6rem)] leading-[0.95] tracking-tight mb-6"
+        >
+          Props That Make
+          <br />
+          <span className="text-[#00d4b1]">Scenes Iconic</span>
+        </motion.h1>
+
+        {/* Subtitle */}
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={2}
+          className="text-[#8b8ba0] text-base md:text-lg max-w-xl leading-relaxed mb-8 md:mb-10"
+        >
+          {totalItems}+ curated furniture pieces for film, television and
+          advertising productions. Inspect before you book.
+        </motion.p>
+
+        {/* Buttons */}
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate="visible"
+          custom={3}
+          className="flex flex-wrap gap-4"
+        >
+          <Link
+            href="#categories"
+            className="inline-flex items-center gap-2 px-7 py-3.5 bg-[#00d4b1] text-[#06060a] font-display font-semibold text-sm tracking-wide rounded-lg hover:bg-[#00f0cc] transition-colors duration-300"
+          >
+            Browse Catalog
+            <svg width="16" height="16" viewBox="0 0 16 16" fill="none" className="ml-1">
+              <path d="M3 8h10M9 4l4 4-4 4" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round"/>
+            </svg>
+          </Link>
+          <a
+            href={waLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2 px-7 py-3.5 border border-[rgba(255,255,255,0.12)] text-[#ededf0] font-display font-medium text-sm tracking-wide rounded-lg hover:border-[#00d4b1] hover:text-[#00d4b1] transition-all duration-300"
+          >
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.638l4.68-1.318A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.346 0-4.542-.671-6.405-1.826l-.447-.273-2.772.78.714-2.622-.3-.475A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+            WhatsApp Us
+          </a>
+        </motion.div>
+      </div>
+
+      {/* Scroll indicator */}
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ delay: 1.5, duration: 0.8 }}
+        className="absolute bottom-8 left-1/2 -translate-x-1/2 flex flex-col items-center gap-2"
       >
-        {/* Image layer */}
-        <div className="absolute inset-0 overflow-hidden">
-          {cat.thumbnail ? (
-            <Image
-              src={cat.thumbnail}
-              alt={cat.name}
-              fill
-              priority={index < 2}
-              className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] opacity-60 group-hover:opacity-80"
-              sizes="(max-width: 640px) 50vw, (max-width: 1024px) 33vw, 25vw"
-            />
-          ) : (
-            <div className="w-full h-full bg-gradient-to-br from-[#0d0d1a] to-[#050507]" />
-          )}
-          {/* Gradient overlay */}
-          <div className="absolute inset-0 bg-gradient-to-t from-[#050507] via-[#050507]/40 to-transparent" />
-          {/* Accent bottom line on hover */}
-          <div className="absolute bottom-0 left-0 right-0 h-px bg-gradient-to-r from-[#00e5c7] to-transparent scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
-        </div>
-
-        {/* Content */}
-        <div className="relative z-10 flex flex-col justify-between w-full p-5 sm:p-6">
-          <div className="flex justify-between items-start">
-            <span className="font-mono text-[9px] uppercase tracking-[0.3em] text-[#555570]">
-              {String(index + 1).padStart(2, '0')}
-            </span>
-            <span className="font-mono text-[10px] text-[#8888a0] bg-black/50 backdrop-blur-sm border border-white/[0.06] px-2.5 py-1 rounded-full">
-              {cat.item_count ?? 0}
-            </span>
-          </div>
-
-          <div>
-            <div className="h-px w-6 bg-[#00e5c7] mb-3 scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-500" />
-            <h3 className={`font-display font-bold leading-tight text-[#f0f0f5] transition-colors group-hover:text-white ${
-              index < 2 ? 'text-3xl sm:text-4xl' : 'text-xl sm:text-2xl'
-            }`} style={{ letterSpacing: '-0.02em' }}>
-              {cat.name}
-            </h3>
-            <div className="mt-2 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-              <span className="font-mono text-[10px] text-[#00e5c7] uppercase tracking-[0.2em]">Browse</span>
-              <svg width="10" height="10" fill="none" stroke="#00e5c7" strokeWidth="2" viewBox="0 0 24 24">
-                <path d="M5 12h14M12 5l7 7-7 7"/>
-              </svg>
-            </div>
-          </div>
-        </div>
-      </Link>
-    </motion.div>
-  )
+        <span className="text-[#55556a] text-xs font-mono tracking-widest uppercase">Scroll</span>
+        <div className="w-px h-8 bg-gradient-to-b from-[#55556a] to-transparent" />
+      </motion.div>
+    </section>
+  );
 }
 
-/* ── Marquee ticker ── */
-const TICKER = [
-  'Period Furniture', 'Contemporary Pieces', 'Art Deco', 'Rustic Farmhouse',
-  'Inspection Before Booking', '542+ Items In Stock', 'Handpicked for Set',
-  'Bollywood', 'OTT Production', 'Commercial Shoots', 'Mumbai Showroom',
-  '30 Years of Set Craft', 'Chairs & Seating', 'Tables & Storage',
-]
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   MARQUEE BAND
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function MarqueeBand() {
+  const items = [
+    "Period Furniture",
+    "Contemporary Pieces",
+    "Art Deco",
+    "Rustic Farmhouse",
+    "Inspection Before Booking",
+    `542+ Items In Stock`,
+    "Handpicked For Set",
+    "Bollywood",
+    "OTT Production",
+    "Commercial Shoots",
+    "Mumbai Showroom",
+    "25 Years Of Set Craft",
+  ];
 
-function Marquee() {
-  const items = [...TICKER, ...TICKER]
   return (
-    <div className="overflow-hidden border-y border-white/[0.04] py-4 my-0" aria-hidden="true">
-      <div className="flex gap-10 marquee-inner whitespace-nowrap">
-        {items.map((t, i) => (
-          <span key={i} className="inline-flex items-center gap-4 font-mono text-[10px] uppercase tracking-[0.25em] text-[#333348] shrink-0">
-            {t}
-            <span className="text-[#00e5c7] opacity-50">·</span>
+    <div className="relative border-y border-[rgba(255,255,255,0.07)] py-4 overflow-hidden bg-[#0c0c12]">
+      <div className="animate-marquee flex whitespace-nowrap">
+        {[...items, ...items].map((text, i) => (
+          <span
+            key={i}
+            className="inline-flex items-center gap-4 mx-4 text-xs font-mono tracking-[0.15em] uppercase text-[#55556a]"
+          >
+            {text}
+            <span className="w-1 h-1 rounded-full bg-[#00d4b1] opacity-40" />
           </span>
         ))}
       </div>
     </div>
-  )
+  );
 }
 
-/* ══════════════════ MAIN COMPONENT ═══════════════════════════ */
-export default function HomeClient({ categories, totalItems }: { categories: Category[]; totalItems: number }) {
-  const { scrollY } = useScroll()
-  const heroY       = useTransform(scrollY, [0, 600], [0, -120])
-  const heroOpacity = useTransform(scrollY, [0, 500], [1, 0])
-  const orbY1       = useTransform(scrollY, [0, 800], [0, -80])
-  const orbY2       = useTransform(scrollY, [0, 800], [0, 60])
-
-  const visibleCats = categories.filter(c => c.slug !== 'miscellaneous')
-
-  const STATS = [
-    { to: 542, suffix: '+', label: 'Props in Stock' },
-    { to: 12,  suffix: '',  label: 'Categories' },
-    { to: 30,  suffix: '+', label: 'Years in Film' },
-    { to: 1000, suffix: '+', label: 'Productions' },
-  ]
-
-  // Suppress unused variable warning
-  void totalItems
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CATEGORIES SECTION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function CategoriesSection({ categories }: { categories: CategoryData[] }) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
   return (
-    <main className="min-h-screen bg-[#050507] overflow-x-hidden">
-
-      {/* ══════ HERO ══════ */}
-      <section className="relative min-h-screen flex flex-col justify-center overflow-hidden">
-        {/* Animated gradient orbs */}
+    <section
+      id="categories"
+      ref={ref}
+      className="px-6 md:px-12 lg:px-20 xl:px-28 py-20 md:py-28"
+    >
+      <div className="max-w-[1400px] mx-auto">
+        {/* Section Header */}
         <motion.div
-          style={{ y: orbY1, background: 'radial-gradient(circle, rgba(0,229,199,0.08) 0%, transparent 60%)' }}
-          className="absolute top-0 left-0 w-[70vw] h-[70vw] max-w-[600px] max-h-[600px] rounded-full pointer-events-none -translate-x-1/3 -translate-y-1/3"
-          aria-hidden="true"
-        />
-        <motion.div
-          style={{ y: orbY2, background: 'radial-gradient(circle, rgba(255,107,53,0.06) 0%, transparent 60%)' }}
-          className="absolute bottom-0 right-0 w-[60vw] h-[60vw] max-w-[500px] max-h-[500px] rounded-full pointer-events-none translate-x-1/4 translate-y-1/4"
-          aria-hidden="true"
-        />
-
-        {/* Grid lines */}
-        <div className="absolute inset-0 pointer-events-none" aria-hidden="true">
-          <div className="absolute left-[10%] top-0 bottom-0 w-px bg-white/[0.03]" />
-          <div className="absolute left-[90%] top-0 bottom-0 w-px bg-white/[0.03]" />
-        </div>
-
-        {/* Vertical text — desktop only */}
-        <div className="absolute right-10 top-1/2 -translate-y-1/2 hidden xl:flex flex-col items-center gap-3" aria-hidden="true">
-          <div className="w-px h-16 bg-white/[0.06]" />
-          <span className="font-mono text-[9px] text-[#1a1a2a] uppercase tracking-[0.4em]" style={{ writingMode: 'vertical-rl' }}>
-            Est · 1994 · Mumbai
-          </span>
-          <div className="w-px h-16 bg-white/[0.06]" />
-        </div>
-
-        {/* Hero content */}
-        <motion.div
-          style={{ y: heroY, opacity: heroOpacity }}
-          className="relative z-10 px-6 sm:px-12 pt-28 sm:pt-24 pb-16"
+          variants={fadeUp}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          custom={0}
+          className="flex items-end justify-between mb-12 md:mb-16"
         >
-          {/* Eyebrow */}
-          <motion.p
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ delay: 0.1, duration: 0.7, ease: EASE_OUT }}
-            className="font-mono text-[10px] sm:text-xs text-[#00e5c7]/70 uppercase tracking-[0.5em] mb-8"
-          >
-            Mumbai&apos;s Premier Prop House
-          </motion.p>
-
-          {/* Headline */}
-          <div className="overflow-hidden mb-2">
-            <motion.h1
-              initial={{ y: '105%' }}
-              animate={{ y: 0 }}
-              transition={{ duration: 1.0, delay: 0.2, ease: EASE_EXPO }}
-              className="font-display font-bold leading-[0.92] text-[#f0f0f5] uppercase"
-              style={{ fontSize: 'clamp(3rem, 9vw, 7.5rem)', letterSpacing: '-0.03em' }}
-            >
-              Props That Make
-            </motion.h1>
+          <div>
+            <p className="font-mono text-xs tracking-[0.2em] uppercase text-[#00d4b1] mb-3">
+              Browse Collection
+            </p>
+            <h2 className="font-display font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight">
+              Categories
+            </h2>
           </div>
-          <div className="overflow-hidden mb-8">
-            <motion.p
-              initial={{ y: '105%' }}
-              animate={{ y: 0 }}
-              transition={{ duration: 1.0, delay: 0.3, ease: EASE_EXPO }}
-              className="font-display font-bold leading-[0.92] text-[#00e5c7] uppercase"
-              style={{ fontSize: 'clamp(3rem, 9vw, 7.5rem)', letterSpacing: '-0.03em' }}
-            >
-              Scenes Iconic
-            </motion.p>
-          </div>
+          <p className="hidden md:block font-mono text-sm text-[#55556a]">
+            {categories.length} collections
+          </p>
+        </motion.div>
 
-          {/* Divider */}
-          <motion.div
-            initial={{ scaleX: 0 }}
-            animate={{ scaleX: 1 }}
-            transition={{ delay: 0.9, duration: 0.8, ease: EASE_EXPO }}
-            className="h-px bg-gradient-to-r from-[#00e5c7]/40 via-white/10 to-transparent origin-left mb-8 max-w-lg"
-            aria-hidden="true"
-          />
-
-          {/* Sub + CTAs */}
-          <div className="flex flex-col sm:flex-row items-start sm:items-end gap-6 sm:gap-12">
-            <motion.p
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.0, duration: 0.7, ease: EASE_OUT }}
-              className="text-[#8888a0] text-base sm:text-lg max-w-sm leading-relaxed"
-              style={{ lineHeight: 1.65 }}
-            >
-              542+ curated furniture pieces for film, television and advertising productions. Inspect before you book.
-            </motion.p>
-
+        {/* Category Grid — Clean 3-col on desktop, 2-col on mobile */}
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+          {categories.map((cat, i) => (
             <motion.div
-              initial={{ opacity: 0, y: 20 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ delay: 1.2, duration: 0.7, ease: EASE_OUT }}
-              className="flex flex-wrap items-center gap-3 shrink-0"
+              key={cat.id}
+              variants={scaleIn}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              custom={i}
             >
-              <a
-                href="#catalogue"
-                className="group inline-flex items-center gap-3 bg-[#00e5c7] hover:bg-[#00ffdd] text-[#050507] font-sans font-semibold text-[11px] uppercase tracking-[0.12em] px-6 py-3.5 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-4"
-              >
-                Browse Catalog
-                <svg width="11" height="11" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-0.5" aria-hidden="true">
-                  <path d="M5 12h14M12 5l7 7-7 7"/>
-                </svg>
-              </a>
-              <a
-                href={WHATSAPP_BASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 border border-[#00e5c7]/30 hover:border-[#00e5c7]/60 text-[#00e5c7] font-sans font-medium text-[11px] uppercase tracking-[0.12em] px-5 py-3.5 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-4"
-              >
-                <WaIcon size={12} />
-                WhatsApp Us
-              </a>
+              <CategoryCard category={cat} />
             </motion.div>
-          </div>
-
-          {/* Ghost number — desktop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 1.5, duration: 1.2 }}
-            className="absolute top-24 right-16 text-right hidden lg:block select-none pointer-events-none"
-            aria-hidden="true"
-          >
-            <div className="font-display font-bold text-[#0d0d1a]" style={{ fontSize: 'clamp(80px, 12vw, 180px)', letterSpacing: '-0.04em', lineHeight: 1 }}>
-              542
-            </div>
-            <div className="font-mono text-[9px] text-[#1a1a2a] uppercase tracking-[0.3em]">props available</div>
-          </motion.div>
-        </motion.div>
-
-        {/* Scroll indicator */}
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{ delay: 2, duration: 1 }}
-          className="absolute bottom-8 left-1/2 -translate-x-1/2"
-          aria-hidden="true"
-        >
-          <motion.div
-            animate={{ y: [0, 8, 0] }}
-            transition={{ repeat: Infinity, duration: 2, ease: 'easeInOut' }}
-            className="w-5 h-8 border border-white/10 rounded-full flex justify-center pt-1.5"
-          >
-            <div className="w-0.5 h-2 bg-[#00e5c7] rounded-full opacity-60" />
-          </motion.div>
-        </motion.div>
-      </section>
-
-      {/* ══════ MARQUEE ══════ */}
-      <Marquee />
-
-      {/* ══════ STATS ══════ */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.7, ease: EASE_OUT }}
-        className="px-6 sm:px-12 py-14 max-w-7xl mx-auto"
-        aria-label="Key facts about KGN"
-      >
-        <div className="grid grid-cols-2 sm:grid-cols-4 gap-px bg-white/[0.04] rounded-2xl overflow-hidden border border-white/[0.04]">
-          {STATS.map(({ to, suffix, label }) => (
-            <div key={label} className="bg-[#050507] px-5 sm:px-8 py-6 sm:py-8 flex flex-col">
-              <div className="font-mono font-bold text-[#00e5c7]" style={{ fontSize: 'clamp(28px, 3.5vw, 48px)', letterSpacing: '-0.03em' }}>
-                <Count to={to} suffix={suffix} />
-              </div>
-              <div className="font-sans text-[11px] text-[#555570] uppercase tracking-[0.2em] mt-1.5">{label}</div>
-            </div>
           ))}
         </div>
-      </motion.section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ══════ CATALOGUE ══════ */}
-      <section id="catalogue" className="px-6 sm:px-12 pb-24 max-w-7xl mx-auto">
-        <motion.div
-          initial={{ opacity: 0, y: 30 }}
-          whileInView={{ opacity: 1, y: 0 }}
-          viewport={{ once: true }}
-          transition={{ duration: 0.7, ease: EASE_OUT }}
-          className="flex items-end justify-between mb-10"
-        >
-          <div>
-            <p className="font-mono text-[10px] text-[#00e5c7] uppercase tracking-[0.35em] mb-3">Collections</p>
-            <h2 className="font-display font-bold text-[#f0f0f5]" style={{ fontSize: 'clamp(28px, 5vw, 56px)', letterSpacing: '-0.025em' }}>
-              Browse by Prop Type
-            </h2>
+function CategoryCard({ category }: { category: CategoryData }) {
+  const [imgError, setImgError] = useState(false);
+
+  return (
+    <Link
+      href={`/${category.slug}`}
+      className="group block rounded-xl overflow-hidden bg-[#0c0c12] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(0,212,177,0.3)] transition-all duration-400"
+    >
+      {/* Image */}
+      <div className="relative aspect-[4/3] bg-[#0c0c12] overflow-hidden">
+        {category.thumbnail && !imgError ? (
+          <Image
+            src={category.thumbnail}
+            alt={category.name}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center bg-[#0c0c12]">
+            <span className="font-display text-2xl font-bold text-[#1a1a28]">
+              {category.name.charAt(0)}
+            </span>
           </div>
-          <span className="hidden sm:block font-mono text-[10px] text-[#333348] uppercase tracking-[0.2em]">
-            {visibleCats.length} categories
-          </span>
-        </motion.div>
+        )}
+        {/* Overlay gradient */}
+        <div className="absolute inset-0 bg-gradient-to-t from-[#06060a]/80 via-transparent to-transparent opacity-60" />
+      </div>
 
-        {/* Bento grid */}
-        <div className="grid grid-cols-2 sm:grid-cols-6 gap-3 sm:auto-rows-[180px]">
-          {visibleCats.map((cat, i) => (
-            <CatTile key={cat.id} cat={cat} index={i} />
+      {/* Info */}
+      <div className="p-4 flex items-center justify-between">
+        <h3 className="font-display font-semibold text-sm md:text-base text-[#ededf0] group-hover:text-[#00d4b1] transition-colors duration-300 truncate pr-3">
+          {category.name}
+        </h3>
+        <span className="flex-shrink-0 font-mono text-xs px-2.5 py-1 rounded-full bg-[rgba(255,255,255,0.06)] text-[#8b8ba0]">
+          {category.item_count}
+        </span>
+      </div>
+    </Link>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   STATS SECTION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function StatsSection({
+  totalItems,
+  categoryCount,
+}: {
+  totalItems: number;
+  categoryCount: number;
+}) {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-50px" });
+
+  const stats = [
+    { value: totalItems, suffix: "+", label: "Props In Collection" },
+    { value: categoryCount, suffix: "", label: "Categories" },
+    { value: 25, suffix: "+", label: "Years In Film" },
+    { value: 1000, suffix: "+", label: "Productions Served" },
+  ];
+
+  return (
+    <section ref={ref} className="border-y border-[rgba(255,255,255,0.07)] bg-[#0c0c12]">
+      <div className="max-w-[1400px] mx-auto px-6 md:px-12 lg:px-20 xl:px-28 py-16 md:py-20">
+        <div className="grid grid-cols-2 md:grid-cols-4 gap-8 md:gap-12">
+          {stats.map((stat, i) => (
+            <motion.div
+              key={stat.label}
+              variants={fadeUp}
+              initial="hidden"
+              animate={inView ? "visible" : "hidden"}
+              custom={i}
+              className="text-center md:text-left"
+            >
+              <p className="font-display font-bold text-3xl md:text-4xl lg:text-5xl text-[#ededf0] mb-2">
+                {inView ? (
+                  <Counter target={stat.value} suffix={stat.suffix} />
+                ) : (
+                  <span>0{stat.suffix}</span>
+                )}
+              </p>
+              <p className="font-mono text-xs tracking-[0.1em] uppercase text-[#55556a]">
+                {stat.label}
+              </p>
+            </motion.div>
           ))}
         </div>
-      </section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ══════ ABOUT ══════ */}
-      <motion.section
-        id="about"
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: EASE_OUT }}
-        className="px-6 sm:px-12 py-24 max-w-7xl mx-auto border-t border-white/[0.04]"
-        aria-labelledby="about-heading"
-      >
-        <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-start">
-          <div>
-            <p className="font-mono text-[10px] text-[#00e5c7] uppercase tracking-[0.35em] mb-5">About the Showroom</p>
-            <h2
-              id="about-heading"
-              className="font-display font-bold text-[#f0f0f5] leading-tight mb-6"
-              style={{ fontSize: 'clamp(28px, 4vw, 52px)', letterSpacing: '-0.025em' }}
-            >
-              Thirty years of knowing what a set needs.
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   ABOUT SECTION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function AboutSection() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
+
+  const points = [
+    { icon: "🎬", text: "500+ Film & TV Productions" },
+    { icon: "🚚", text: "Delivery Across Maharashtra" },
+    { icon: "⚡", text: "Same-Day Availability" },
+    { icon: "💬", text: "WhatsApp-First Communication" },
+  ];
+
+  return (
+    <section
+      id="about"
+      ref={ref}
+      className="px-6 md:px-12 lg:px-20 xl:px-28 py-20 md:py-28"
+    >
+      <div className="max-w-[1400px] mx-auto">
+        <div className="grid md:grid-cols-2 gap-12 md:gap-20 items-start">
+          {/* Left — Text */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            custom={0}
+          >
+            <p className="font-mono text-xs tracking-[0.2em] uppercase text-[#00d4b1] mb-4">
+              About KGN Props
+            </p>
+            <h2 className="font-display font-bold text-3xl md:text-4xl tracking-tight mb-6 leading-tight">
+              Mumbai&apos;s most trusted
+              <br />
+              prop house since 1994
             </h2>
-            <p className="text-[#8888a0] text-sm sm:text-base leading-relaxed mb-4" style={{ lineHeight: 1.7 }}>
-              KGN Furniture and Props has been supplying the Mumbai film industry since 1994. Our inventory spans five centuries of furniture styles — from colonial teak and Victorian upholstery to mid-century Scandinavian and contemporary minimalist pieces.
+            <p className="text-[#8b8ba0] leading-relaxed text-base md:text-lg">
+              From Bollywood blockbusters to international ad campaigns, KGN
+              Ceramica Furniture has dressed sets that audiences remember. Our
+              showroom in Oshiwara houses hundreds of curated furniture pieces
+              spanning every era and style — ready to inspect, book, and deliver
+              to your set.
             </p>
-            <p className="text-[#8888a0] text-sm sm:text-base leading-relaxed mb-8" style={{ lineHeight: 1.7 }}>
-              Every item has been selected with a working set in mind. Our Mumbai showroom is open to production designers, art directors, and set decorators by appointment.
-            </p>
-            <a
-              href={WHATSAPP_BASE_URL}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="inline-flex items-center gap-2.5 font-sans font-medium text-[11px] uppercase tracking-[0.2em] text-[#8888a0] hover:text-[#00e5c7] transition-colors"
-            >
-              <WaIcon size={13} />
-              Schedule a showroom visit
-            </a>
-          </div>
+          </motion.div>
 
-          <div className="grid grid-cols-2 gap-3">
-            {[
-              { icon: '◈', title: '500+', sub: 'Catalogued pieces' },
-              { icon: '◉', title: '30+', sub: 'Years in the industry' },
-              { icon: '◎', title: 'Inspection', sub: 'Before every booking' },
-              { icon: '◍', title: 'Mumbai', sub: 'Showroom by appointment' },
-            ].map(({ icon, title, sub }) => (
-              <div key={title} className="glass rounded-xl p-5">
-                <div className="font-mono text-[#00e5c7] text-lg mb-3">{icon}</div>
-                <div className="font-display font-bold text-[#f0f0f5] text-lg mb-1" style={{ letterSpacing: '-0.02em' }}>{title}</div>
-                <div className="font-sans text-[11px] text-[#555570] uppercase tracking-[0.15em] leading-relaxed">{sub}</div>
-              </div>
+          {/* Right — Trust Points */}
+          <motion.div
+            variants={fadeUp}
+            initial="hidden"
+            animate={inView ? "visible" : "hidden"}
+            custom={2}
+            className="space-y-5"
+          >
+            {points.map((pt, i) => (
+              <motion.div
+                key={pt.text}
+                variants={fadeUp}
+                initial="hidden"
+                animate={inView ? "visible" : "hidden"}
+                custom={i + 2}
+                className="flex items-center gap-4 p-4 rounded-lg border border-[rgba(255,255,255,0.07)] bg-[#0c0c12]/50 hover:border-[rgba(255,255,255,0.14)] transition-colors"
+              >
+                <span className="text-xl">{pt.icon}</span>
+                <span className="font-display font-medium text-sm md:text-base text-[#ededf0]">
+                  {pt.text}
+                </span>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         </div>
-      </motion.section>
+      </div>
+    </section>
+  );
+}
 
-      {/* ══════ CONTACT CTA ══════ */}
-      <motion.section
-        initial={{ opacity: 0, y: 40 }}
-        whileInView={{ opacity: 1, y: 0 }}
-        viewport={{ once: true }}
-        transition={{ duration: 0.8, ease: EASE_OUT }}
-        className="relative border-t border-white/[0.04] overflow-hidden"
-        aria-labelledby="contact-heading"
-      >
-        <div className="absolute inset-0 bg-gradient-to-b from-transparent to-[#0a0a0f]/30 pointer-events-none" />
-        <div className="relative max-w-7xl mx-auto px-6 sm:px-12 py-20">
-          <div className="max-w-2xl mx-auto text-center mb-12">
-            <p className="font-mono text-[10px] text-[#00e5c7] uppercase tracking-[0.35em] mb-5">Get In Touch</p>
-            <h2
-              id="contact-heading"
-              className="font-display font-bold text-[#f0f0f5] leading-tight mb-4"
-              style={{ fontSize: 'clamp(32px, 5vw, 64px)', letterSpacing: '-0.03em' }}
-            >
-              Ready to dress your set?
-            </h2>
-            <p className="text-[#8888a0] text-base leading-relaxed mb-8" style={{ lineHeight: 1.65 }}>
-              Our showroom holds 500+ pieces. If you don&rsquo;t see what your set requires, talk to us — we&rsquo;ve been sourcing for Indian productions since 1994.
-            </p>
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   CTA SECTION
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function CTASection() {
+  const ref = useRef(null);
+  const inView = useInView(ref, { once: true, margin: "-80px" });
 
-            <div className="flex flex-col sm:flex-row items-center justify-center gap-3">
-              <a
-                href={WHATSAPP_BASE_URL}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 bg-[#25D366] hover:bg-[#20c55e] text-white font-sans font-semibold text-[11px] uppercase tracking-[0.12em] px-8 py-4 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#25D366] focus-visible:outline-offset-4"
-              >
-                <WaIcon size={14} />
-                WhatsApp the Showroom
-              </a>
-              <Link
-                href="/book"
-                className="w-full sm:w-auto inline-flex items-center justify-center gap-3 border border-[#00e5c7]/30 hover:border-[#00e5c7]/60 hover:bg-[#00e5c7]/5 text-[#00e5c7] font-sans font-semibold text-[11px] uppercase tracking-[0.12em] px-8 py-4 rounded-full transition-all duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#00e5c7] focus-visible:outline-offset-4"
-              >
-                Build Your Shortlist
-              </Link>
-            </div>
-          </div>
+  return (
+    <section
+      ref={ref}
+      className="px-6 md:px-12 lg:px-20 xl:px-28 py-20 md:py-28 bg-[#0c0c12] border-t border-[rgba(255,255,255,0.07)]"
+    >
+      <div className="max-w-[1400px] mx-auto text-center">
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          custom={0}
+          className="font-mono text-xs tracking-[0.2em] uppercase text-[#00d4b1] mb-4"
+        >
+          Get In Touch
+        </motion.p>
+        <motion.h2
+          variants={fadeUp}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          custom={1}
+          className="font-display font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight mb-4"
+        >
+          Ready to dress your set?
+        </motion.h2>
+        <motion.p
+          variants={fadeUp}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          custom={2}
+          className="text-[#8b8ba0] text-base md:text-lg max-w-lg mx-auto mb-10"
+        >
+          Reach out on WhatsApp for availability, pricing, and to schedule a
+          showroom visit in Oshiwara, Mumbai.
+        </motion.p>
+        <motion.div
+          variants={fadeUp}
+          initial="hidden"
+          animate={inView ? "visible" : "hidden"}
+          custom={3}
+          className="flex flex-wrap justify-center gap-4"
+        >
+          <a
+            href={waLink()}
+            target="_blank"
+            rel="noopener noreferrer"
+            className="inline-flex items-center gap-2.5 px-8 py-4 bg-[#25D366] text-white font-display font-semibold text-sm rounded-lg hover:bg-[#20bd5a] transition-colors"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="currentColor">
+              <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+              <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.638l4.68-1.318A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.346 0-4.542-.671-6.405-1.826l-.447-.273-2.772.78.714-2.622-.3-.475A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+            </svg>
+            Chat on WhatsApp
+          </a>
+          <a
+            href="tel:+919999999999"
+            className="inline-flex items-center gap-2 px-8 py-4 border border-[rgba(255,255,255,0.12)] text-[#ededf0] font-display font-medium text-sm rounded-lg hover:border-[rgba(255,255,255,0.25)] transition-colors"
+          >
+            📞 Call Us
+          </a>
+        </motion.div>
+      </div>
+    </section>
+  );
+}
 
-          {/* Footer */}
-          <div className="border-t border-white/[0.04] pt-6 flex flex-col sm:flex-row items-center justify-between gap-3">
-            <p className="font-display font-semibold text-[#1a1a2a] text-sm" style={{ letterSpacing: '-0.01em' }}>
-              The working prop house for Indian cinema.
-            </p>
-            <div className="flex flex-wrap items-center gap-4 font-mono text-[10px] text-[#1a1a2a] uppercase tracking-[0.2em]">
-              <span>Mumbai, Maharashtra</span>
-              <span>Est. 1994</span>
-              <span>© {new Date().getFullYear()} KGN</span>
-            </div>
-          </div>
-        </div>
-      </motion.section>
-    </main>
-  )
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   FOOTER
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function Footer() {
+  return (
+    <footer className="px-6 md:px-12 lg:px-20 xl:px-28 py-10 border-t border-[rgba(255,255,255,0.07)]">
+      <div className="max-w-[1400px] mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+        <p className="font-display font-bold text-lg tracking-tight">
+          KGN<span className="text-[#00d4b1]">.</span>
+        </p>
+        <p className="text-[#55556a] text-xs font-mono">
+          © {new Date().getFullYear()} KGN Ceramica Furniture • Oshiwara, Mumbai
+        </p>
+        <p className="text-[#55556a] text-xs">
+          Built for the Indian Film Industry
+        </p>
+      </div>
+    </footer>
+  );
+}
+
+/* ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+   WHATSAPP FAB
+   ━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━ */
+function WhatsAppFab() {
+  const [visible, setVisible] = useState(false);
+
+  useEffect(() => {
+    const timer = setTimeout(() => setVisible(true), 2000);
+    return () => clearTimeout(timer);
+  }, []);
+
+  return (
+    <AnimatePresence>
+      {visible && (
+        <motion.a
+          initial={{ opacity: 0, scale: 0.8, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.8 }}
+          href={waLink()}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="fixed bottom-6 right-6 z-50 w-14 h-14 flex items-center justify-center rounded-full bg-[#25D366] text-white shadow-lg shadow-[#25D366]/20 pulse-glow hover:scale-110 transition-transform"
+          aria-label="Chat on WhatsApp"
+        >
+          <svg width="26" height="26" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+            <path d="M12 0C5.373 0 0 5.373 0 12c0 2.625.846 5.059 2.284 7.034L.789 23.492a.5.5 0 00.612.638l4.68-1.318A11.94 11.94 0 0012 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-2.346 0-4.542-.671-6.405-1.826l-.447-.273-2.772.78.714-2.622-.3-.475A9.953 9.953 0 012 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+          </svg>
+        </motion.a>
+      )}
+    </AnimatePresence>
+  );
 }

@@ -1,273 +1,203 @@
-'use client'
-import { useState, useMemo, useCallback } from 'react'
-import { motion, type Variants } from 'framer-motion'
-import Image from 'next/image'
-import Link from 'next/link'
-import { useCart } from '@/components/CartContext'
+"use client";
 
-interface ItemWithImage {
-  id: string
-  item_code: string
-  name: string
-  material: string | null
-  color: string | null
-  height: string | null
-  length: string | null
-  width: string | null
-  depth: string | null
-  status: string
-  quantity_available: number
-  quantity_total: number
-  primary_image_url: string | null
-  category_slug: string
+import { useState, useRef } from "react";
+import { motion, useInView } from "framer-motion";
+import Image from "next/image";
+import Link from "next/link";
+
+/* ── Types ── */
+interface ItemData {
+  id: string;
+  item_code: string;
+  name: string;
+  material: string | null;
+  color: string | null;
+  quantity_available: number;
+  quantity_total: number;
+  status: string;
+  thumbnail: string | null;
 }
 
-interface Props {
-  items: ItemWithImage[]
-  categorySlug: string
-  categoryName: string
+interface CategoryClientProps {
+  category: {
+    name: string;
+    slug: string;
+    item_count: number;
+  };
+  items: ItemData[];
 }
 
-const EASE_OUT = [0.25, 0.46, 0.45, 0.94] as [number, number, number, number]
-
-const fadeUp: Variants = {
+/* ── Animation ── */
+const EASE = [0.22, 1, 0.36, 1] as const;
+const fadeUp = {
   hidden: { opacity: 0, y: 24 },
   visible: (i: number = 0) => ({
-    opacity: 1, y: 0,
-    transition: { duration: 0.55, delay: i * 0.05, ease: EASE_OUT }
+    opacity: 1,
+    y: 0,
+    transition: { duration: 0.6, ease: EASE, delay: i * 0.04 },
   }),
-}
+};
 
-function StatusDot({ status }: { status: string }) {
-  const cls =
-    status === 'available' ? 'bg-green-500' :
-    status === 'booked' ? 'bg-red-500' :
-    status === 'maintenance' ? 'bg-yellow-500' : 'bg-zinc-600'
-  const label =
-    status === 'available' ? 'Available' :
-    status === 'booked' ? 'Booked' :
-    status === 'maintenance' ? 'Maintenance' : 'Unavailable'
-  return (
-    <span className="flex items-center gap-1.5">
-      <span className={`w-1.5 h-1.5 rounded-full shrink-0 ${cls}`} />
-      <span className="text-[10px] font-mono text-[#8888a0]">{label}</span>
-    </span>
-  )
-}
+export default function CategoryClient({ category, items }: CategoryClientProps) {
+  const [filter, setFilter] = useState<"all" | "available">("all");
+  const gridRef = useRef(null);
+  const gridInView = useInView(gridRef, { once: true, margin: "-40px" });
 
-function ItemCard({ item, index, categorySlug }: { item: ItemWithImage; index: number; categorySlug: string }) {
-  const { addToCart, isInCart, openCart } = useCart()
-  const inCart = isInCart(item.item_code)
-  const canBook = item.status === 'available' && item.quantity_available > 0
-
-  const handleCartClick = useCallback((e: React.MouseEvent) => {
-    e.preventDefault()
-    if (inCart) { openCart(); return }
-    addToCart({
-      id: item.id,
-      item_code: item.item_code,
-      name: item.name,
-      category_slug: categorySlug,
-      image_url: item.primary_image_url,
-      max_qty: item.quantity_available,
-      status: item.status,
-    })
-  }, [addToCart, openCart, inCart, item, categorySlug])
+  const filteredItems =
+    filter === "available"
+      ? items.filter((item) => item.status === "available" && item.quantity_available > 0)
+      : items;
 
   return (
-    <motion.div
-      variants={fadeUp}
-      initial="hidden"
-      whileInView="visible"
-      viewport={{ once: true, margin: '-40px' }}
-      custom={index % 12}
-    >
-      <div className="group relative bg-[#0a0a0f] border border-white/[0.06] rounded-lg overflow-hidden hover:border-white/[0.12] transition-colors duration-300">
-        {/* Image */}
-        <Link href={`/${categorySlug}/${item.item_code}`} className="block">
-          <div className="aspect-[4/3] relative bg-[#0d0d1a] overflow-hidden">
-            {item.primary_image_url ? (
-              <Image
-                src={item.primary_image_url}
-                alt={item.name}
-                fill
-                className="object-cover transition-transform duration-500 ease-out group-hover:scale-[1.04]"
-                sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 25vw"
-              />
-            ) : (
-              <div className="w-full h-full flex items-center justify-center text-[#1a1a2a]">
-                <svg width="32" height="32" fill="none" stroke="currentColor" strokeWidth="1" viewBox="0 0 24 24" aria-label="No image available" role="img">
-                  <rect x="3" y="3" width="18" height="18" rx="2"/>
-                  <path d="M3 9h18M9 21V9"/>
-                </svg>
-              </div>
-            )}
+    <main className="min-h-screen pt-20">
+      {/* ── Header ── */}
+      <div className="px-6 md:px-12 lg:px-20 xl:px-28 pt-8 pb-6 md:pt-12 md:pb-10">
+        <div className="max-w-[1400px] mx-auto">
+          {/* Breadcrumb */}
+          <nav className="flex items-center gap-2 mb-6 text-xs font-mono text-[#55556a]">
+            <Link href="/" className="hover:text-[#8b8ba0] transition-colors">
+              Home
+            </Link>
+            <span>/</span>
+            <span className="text-[#8b8ba0]">{category.name}</span>
+          </nav>
 
-            {/* Hover overlay with quick action */}
-            <div className="absolute inset-0 bg-black/40 opacity-0 group-hover:opacity-100 transition-opacity duration-300 flex items-center justify-center">
-              <span className="font-mono text-xs text-white border border-white/30 px-3 py-1.5 rounded-full">
-                View Details →
-              </span>
-            </div>
-
-            {/* Qty badge */}
-            {item.quantity_total > 1 && (
-              <span className="absolute top-2 left-2 bg-black/70 text-[#F0F0F5] text-[9px] font-mono px-1.5 py-0.5 rounded backdrop-blur-sm">
-                ×{item.quantity_available}/{item.quantity_total}
-              </span>
-            )}
-
-            {/* In-shortlist indicator */}
-            {inCart && (
-              <span className="absolute top-2 right-2 bg-[#00e5c7] text-[#050507] text-[9px] font-mono px-1.5 py-0.5 rounded">
-                In Shortlist
-              </span>
-            )}
-          </div>
-        </Link>
-
-        {/* Info */}
-        <div className="p-3">
-          <div className="flex items-start justify-between gap-2 mb-1.5">
-            <span className="font-mono text-xs text-[#00e5c7]">{item.item_code}</span>
-            <StatusDot status={item.status} />
-          </div>
-          <Link href={`/${categorySlug}/${item.item_code}`}>
-            <div className="text-sm text-[#e0e0e8] font-medium leading-snug group-hover:text-white transition-colors line-clamp-2 mb-2">
-              {item.name}
-            </div>
-          </Link>
-
-          {/* Dims */}
-          {(item.height || item.width || item.length) && (
-            <div className="text-[10px] font-mono text-[#555570] mb-2">
-              {[item.height && `H ${item.height}`, item.length && `L ${item.length}`, item.width && `W ${item.width}`].filter(Boolean).join(' · ')}
-            </div>
-          )}
-
-          <div className="flex items-center justify-between gap-2">
-            {item.material && (
-              <span className="text-[10px] font-mono text-[#555570] bg-[#0d0d1a] border border-white/[0.06] px-2 py-0.5 rounded truncate">
-                {item.material}
-              </span>
-            )}
-            {canBook && (
-              <button
-                onClick={handleCartClick}
-                className={`ml-auto shrink-0 flex items-center gap-1.5 text-[10px] font-mono px-2.5 py-1.5 rounded transition-all ${
-                  inCart
-                    ? 'bg-[#00e5c7]/10 border border-[#00e5c7]/30 text-[#00e5c7]'
-                    : 'bg-[#0d0d1a] border border-white/[0.08] text-[#8888a0] hover:border-[#00e5c7] hover:text-[#00e5c7]'
-                }`}
+          {/* Title Row */}
+          <div className="flex flex-col md:flex-row md:items-end md:justify-between gap-4">
+            <div>
+              <motion.h1
+                initial={{ opacity: 0, y: 20 }}
+                animate={{ opacity: 1, y: 0 }}
+                transition={{ duration: 0.6, ease: EASE }}
+                className="font-display font-bold text-3xl md:text-4xl lg:text-5xl tracking-tight"
               >
-                {inCart ? (
-                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M20 6 9 17l-5-5"/></svg>Shortlisted</>
-                ) : (
-                  <><svg width="10" height="10" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 5v14M5 12h14"/></svg>Add to Shortlist</>
-                )}
-              </button>
-            )}
+                {category.name}
+              </motion.h1>
+              <motion.p
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                transition={{ delay: 0.2, duration: 0.5 }}
+                className="font-mono text-sm text-[#8b8ba0] mt-2"
+              >
+                {category.item_count} pieces available
+              </motion.p>
+            </div>
+
+            {/* Filter */}
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ delay: 0.3, duration: 0.5 }}
+              className="flex items-center gap-2"
+            >
+              {(["all", "available"] as const).map((f) => (
+                <button
+                  key={f}
+                  onClick={() => setFilter(f)}
+                  className={`px-4 py-2 font-mono text-xs tracking-wide rounded-lg border transition-all duration-300 ${
+                    filter === f
+                      ? "border-[#00d4b1] text-[#00d4b1] bg-[rgba(0,212,177,0.08)]"
+                      : "border-[rgba(255,255,255,0.07)] text-[#8b8ba0] hover:border-[rgba(255,255,255,0.14)]"
+                  }`}
+                >
+                  {f === "all" ? "All Items" : "Available"}
+                </button>
+              ))}
+            </motion.div>
           </div>
         </div>
       </div>
-    </motion.div>
-  )
+
+      {/* ── Item Grid ── */}
+      <div
+        ref={gridRef}
+        className="px-6 md:px-12 lg:px-20 xl:px-28 pb-20 md:pb-28"
+      >
+        <div className="max-w-[1400px] mx-auto">
+          {filteredItems.length === 0 ? (
+            <div className="text-center py-20">
+              <p className="text-[#55556a] font-mono text-sm">
+                No items match your filter.
+              </p>
+            </div>
+          ) : (
+            <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-5">
+              {filteredItems.map((item, i) => (
+                <motion.div
+                  key={item.id}
+                  variants={fadeUp}
+                  initial="hidden"
+                  animate={gridInView ? "visible" : "hidden"}
+                  custom={Math.min(i, 15)} // Cap delay so late items don't wait forever
+                >
+                  <ItemCard item={item} categorySlug={category.slug} />
+                </motion.div>
+              ))}
+            </div>
+          )}
+        </div>
+      </div>
+    </main>
+  );
 }
 
-export default function CategoryClient({ items, categorySlug, categoryName }: Props) {
-  const [materialFilter, setMaterialFilter] = useState('')
-  const [colorFilter, setColorFilter] = useState('')
-  const [availableOnly, setAvailableOnly] = useState(false)
-  const [showFilters, setShowFilters] = useState(false)
-
-  const materials = useMemo(() => {
-    const s = new Set<string>()
-    items.forEach(i => { if (i.material) s.add(i.material) })
-    return Array.from(s).sort()
-  }, [items])
-
-  const colors = useMemo(() => {
-    const s = new Set<string>()
-    items.forEach(i => { if (i.color) s.add(i.color) })
-    return Array.from(s).sort()
-  }, [items])
-
-  const filtered = useMemo(() => items.filter(i => {
-    if (availableOnly && i.status !== 'available') return false
-    if (materialFilter && i.material !== materialFilter) return false
-    if (colorFilter && i.color !== colorFilter) return false
-    return true
-  }), [items, materialFilter, colorFilter, availableOnly])
-
-  const activeFilterCount = (materialFilter ? 1 : 0) + (colorFilter ? 1 : 0) + (availableOnly ? 1 : 0)
-
-  const selectCls = "bg-[#0a0a0f] border border-white/[0.08] rounded-full px-4 py-2 text-sm text-[#e0e0e8] font-mono focus:outline-none focus:border-[#00e5c7] cursor-pointer transition-colors"
+/* ── Item Card ── */
+function ItemCard({ item, categorySlug }: { item: ItemData; categorySlug: string }) {
+  const [imgError, setImgError] = useState(false);
+  const isAvailable = item.status === "available" && item.quantity_available > 0;
 
   return (
-    <>
-      {/* Filter Bar */}
-      <div className="flex flex-wrap items-center gap-2 mb-8">
-        {/* Mobile toggle */}
-        <button
-          onClick={() => setShowFilters(v => !v)}
-          className="sm:hidden flex items-center gap-2 px-4 py-2 rounded-full border border-white/[0.08] text-sm font-mono text-[#8888a0]"
-        >
-          <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2" viewBox="0 0 24 24">
-            <line x1="4" y1="6" x2="20" y2="6"/><line x1="8" y1="12" x2="16" y2="12"/><line x1="10" y1="18" x2="14" y2="18"/>
-          </svg>
-          Filters {activeFilterCount > 0 && <span className="bg-[#00e5c7] text-[#050507] text-[9px] px-1.5 rounded-full">{activeFilterCount}</span>}
-        </button>
+    <Link
+      href={`/${categorySlug}/${item.item_code}`}
+      className="group block rounded-xl overflow-hidden bg-[#0c0c12] border border-[rgba(255,255,255,0.07)] hover:border-[rgba(0,212,177,0.25)] transition-all duration-400"
+    >
+      {/* Image */}
+      <div className="relative aspect-[4/5] bg-[#0a0a10] overflow-hidden">
+        {item.thumbnail && !imgError ? (
+          <Image
+            src={item.thumbnail}
+            alt={item.name}
+            fill
+            sizes="(max-width: 768px) 50vw, (max-width: 1024px) 33vw, 25vw"
+            className="object-cover transition-transform duration-500 ease-out group-hover:scale-105"
+            onError={() => setImgError(true)}
+          />
+        ) : (
+          <div className="absolute inset-0 flex items-center justify-center">
+            <span className="font-mono text-sm text-[#2a2a3a]">{item.item_code}</span>
+          </div>
+        )}
 
-        <div className={`${showFilters ? 'flex' : 'hidden'} sm:flex flex-wrap gap-2 w-full sm:w-auto`}>
-          <select value={materialFilter} onChange={e => setMaterialFilter(e.target.value)} className={selectCls}>
-            <option value="">All Materials</option>
-            {materials.map(m => <option key={m} value={m}>{m}</option>)}
-          </select>
-
-          <select value={colorFilter} onChange={e => setColorFilter(e.target.value)} className={selectCls}>
-            <option value="">All Colors</option>
-            {colors.map(c => <option key={c} value={c}>{c}</option>)}
-          </select>
-
-          <button
-            onClick={() => setAvailableOnly(v => !v)}
-            className={`flex items-center gap-2 px-4 py-2 rounded-full border text-sm font-mono transition-colors ${
-              availableOnly
-                ? 'border-green-500/60 text-green-400 bg-green-500/10'
-                : 'border-white/[0.08] text-[#8888a0] hover:border-white/[0.16]'
+        {/* Status badge */}
+        <div className="absolute top-3 right-3">
+          <span
+            className={`inline-block px-2.5 py-1 rounded-full text-[10px] font-mono tracking-wide ${
+              isAvailable
+                ? "bg-[rgba(0,212,177,0.15)] text-[#00d4b1]"
+                : "bg-[rgba(255,80,80,0.15)] text-[#ff5050]"
             }`}
           >
-            <span className={`w-1.5 h-1.5 rounded-full ${availableOnly ? 'bg-green-500' : 'bg-[#555570]'}`} />
-            Available
-          </button>
-
-          {activeFilterCount > 0 && (
-            <button
-              onClick={() => { setMaterialFilter(''); setColorFilter(''); setAvailableOnly(false) }}
-              className="px-3 py-2 rounded-full text-xs font-mono text-[#00e5c7] hover:bg-[#00e5c7]/10 transition-colors"
-            >
-              Clear ×
-            </button>
-          )}
+            {isAvailable ? "Available" : "Booked"}
+          </span>
         </div>
-
-        <span className="ml-auto text-xs font-mono text-[#555570]">
-          {filtered.length} / {items.length}
-        </span>
       </div>
 
-      {/* Grid */}
-      {filtered.length === 0 ? (
-        <div className="py-24 text-center">
-          <p className="text-[#555570] font-mono text-sm">No items match your filters.</p>
+      {/* Info */}
+      <div className="p-4">
+        <h3 className="font-display font-medium text-sm text-[#ededf0] truncate group-hover:text-[#00d4b1] transition-colors duration-300">
+          {item.name}
+        </h3>
+        <div className="flex items-center justify-between mt-1.5">
+          <span className="font-mono text-[11px] text-[#55556a]">
+            {item.item_code}
+          </span>
+          {item.quantity_total > 1 && (
+            <span className="font-mono text-[11px] text-[#55556a]">
+              Qty: {item.quantity_available}/{item.quantity_total}
+            </span>
+          )}
         </div>
-      ) : (
-        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-          {filtered.map((item, i) => (
-            <ItemCard key={item.id} item={{ ...item, category_slug: categorySlug }} index={i} categorySlug={categorySlug} />
-          ))}
-        </div>
-      )}
-    </>
-  )
+      </div>
+    </Link>
+  );
 }
