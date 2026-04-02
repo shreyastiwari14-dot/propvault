@@ -3,6 +3,7 @@ import { motion, useScroll, useTransform, useInView, type Variants } from 'frame
 import { useRef, useEffect, useState } from 'react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { WHATSAPP_BASE_URL } from '@/lib/config'
 
 interface Category {
   id: string
@@ -56,7 +57,7 @@ function CatTile({ cat, index }: { cat: Category; index: number }) {
       variants={cardVariants}
       initial="hidden"
       whileInView="visible"
-      viewport={{ once: true, margin: '-60px' }}
+      viewport={{ once: true, margin: '200px' }}
       custom={index}
       className={isFirst ? 'sm:row-span-2' : ''}
     >
@@ -75,7 +76,7 @@ function CatTile({ cat, index }: { cat: Category; index: number }) {
               fill
               priority={isFirst}
               className="object-cover transition-transform duration-700 ease-out group-hover:scale-[1.06] opacity-70 group-hover:opacity-90"
-              sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw"
+              sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
             />
           ) : (
             <div className="w-full h-full bg-gradient-to-br from-[#111118] to-[#020206]" />
@@ -103,9 +104,9 @@ function CatTile({ cat, index }: { cat: Category; index: number }) {
               transition={{ delay: index * 0.08 + 0.5, duration: 0.6, ease: EASE_EXPO }}
               className="h-px w-8 bg-[#C8902A] origin-left mb-3"
             />
-            <h3 className={`font-display font-light leading-tight text-[#F0F0F5] transition-colors group-hover:text-white ${
+            <h3 className={`font-bold leading-tight text-[#F0F0F5] transition-colors group-hover:text-white ${
               isFirst ? 'text-4xl sm:text-5xl' : 'text-2xl sm:text-3xl'
-            }`}>
+            }`} style={{ letterSpacing: '-0.02em' }}>
               {cat.name}
             </h3>
             <div className="mt-3 flex items-center gap-2 opacity-0 group-hover:opacity-100 transition-opacity duration-300">
@@ -164,7 +165,12 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
 
   const visibleCats = categories.filter(c => c.slug !== 'miscellaneous')
   const miscCat     = categories.find(c => c.slug === 'miscellaneous')
-  const waBase      = `https://wa.me/${process.env.NEXT_PUBLIC_WHATSAPP_NUMBER ?? '919999999999'}`
+
+  const STATS = [
+    { to: 542, suffix: '', label: 'Props in Stock', isStatic: false },
+    { to: 10,  suffix: '', label: 'Prop Categories', isStatic: false },
+    { to: 30,  suffix: '+', label: 'Years of Set Craft', isStatic: true },
+  ]
 
   return (
     <main className="min-h-screen bg-[#020206] overflow-x-hidden">
@@ -172,17 +178,26 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
       {/* ══════════════════════════════ NAV ══════════════════════════════ */}
       <nav className="fixed top-0 left-0 right-0 z-50 flex items-center justify-between px-6 sm:px-12 py-5" aria-label="Main navigation">
         <div className="absolute inset-0 backdrop-blur-md bg-[#020206]/75 border-b border-white/[0.04]" aria-hidden="true" />
-        <Link href="/" className="relative font-mono text-xs text-[#F0F0F5] uppercase tracking-[0.3em]">
+        <Link
+          href="/"
+          aria-label="KGN Furniture and Props — Home"
+          className="relative font-mono text-xs text-[#F0F0F5] uppercase tracking-[0.3em] focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded"
+        >
           KGN
         </Link>
         <div className="relative flex items-center gap-6">
-          <a href="#catalogue" className="hidden sm:block font-mono text-[10px] text-[#555568] uppercase tracking-[0.25em] hover:text-[#7070A0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded">
+          <a
+            href="#catalogue"
+            aria-label="Browse prop catalogue"
+            className="hidden sm:block font-mono text-[10px] text-[#555568] uppercase tracking-[0.25em] hover:text-[#7070A0] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded"
+          >
             Browse Props
           </a>
           <a
-            href={waBase}
+            href={WHATSAPP_BASE_URL}
             target="_blank"
             rel="noopener noreferrer"
+            aria-label="Contact KGN on WhatsApp"
             className="flex items-center gap-2 font-mono text-[11px] text-[#7070A0] hover:text-[#25D366] transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-2 rounded"
           >
             <WaIcon size={13} />
@@ -217,39 +232,41 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
         {/* Hero content */}
         <motion.div style={{ y: heroY, opacity: heroOpacity }} className="relative z-10 px-6 sm:px-12 pt-24">
 
-          {/* SEO-friendly H1 as eyebrow label */}
-          <motion.h1
+          {/* Eyebrow label — NOT a heading for correct H1 hierarchy */}
+          <motion.p
             initial={{ opacity: 0, y: 16 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.1, duration: 0.6, ease: EASE_OUT }}
             className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.4em] mb-10"
           >
             Prop Rental for Film &amp; OTT Production · Mumbai · Est. 1994
-          </motion.h1>
+          </motion.p>
 
-          {/* Brand display */}
+          {/* Brand display — KGN wordmark */}
           <div className="overflow-hidden mb-0">
             <motion.p
               initial={{ y: '110%' }}
               animate={{ y: 0 }}
               transition={{ duration: 1.1, delay: 0.2, ease: EASE_EXPO }}
-              className="font-display font-light leading-[0.85] tracking-[-0.02em] text-[#F0F0F5]"
-              style={{ fontSize: 'clamp(72px, 16vw, 220px)' }}
+              className="font-extrabold leading-[0.85] text-[#F0F0F5]"
+              style={{ fontSize: 'clamp(72px, 16vw, 220px)', letterSpacing: '-0.04em' }}
               aria-label="KGN"
             >
               KGN
             </motion.p>
           </div>
+
+          {/* Primary H1 — the keyword-rich heading */}
           <div className="overflow-hidden mb-8">
-            <motion.h2
+            <motion.h1
               initial={{ y: '110%' }}
               animate={{ y: 0 }}
               transition={{ duration: 1.1, delay: 0.35, ease: EASE_EXPO }}
-              className="font-display font-light leading-[0.85] tracking-[-0.01em] text-[#4A4A6A] italic"
-              style={{ fontSize: 'clamp(30px, 7vw, 96px)' }}
+              className="font-bold leading-[0.85] text-[#4A4A6A]"
+              style={{ fontSize: 'clamp(30px, 7vw, 96px)', letterSpacing: '-0.03em' }}
             >
               Furniture &amp; Props
-            </motion.h2>
+            </motion.h1>
           </div>
 
           {/* Divider */}
@@ -268,6 +285,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
               animate={{ opacity: 1, y: 0 }}
               transition={{ delay: 1.1, duration: 0.7, ease: EASE_OUT }}
               className="text-[#7070A0] text-base sm:text-lg leading-relaxed max-w-xs"
+              style={{ lineHeight: 1.65 }}
             >
               The Mumbai prop house for Indian cinema. 500+ pieces — available to inspect and collect from our showroom.
             </motion.p>
@@ -280,7 +298,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
             >
               <a
                 href="#catalogue"
-                className="group inline-flex items-center gap-3 bg-[#C8902A] hover:bg-[#D9A030] text-[#020206] font-mono text-xs uppercase tracking-[0.15em] px-6 py-3.5 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-4"
+                className="group inline-flex items-center gap-3 bg-[#C8902A] hover:bg-[#D9A030] text-[#020206] font-semibold text-xs uppercase tracking-[0.1em] px-6 py-3.5 rounded-full transition-colors duration-300 focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#C8902A] focus-visible:outline-offset-4"
               >
                 View the Inventory
                 <svg width="12" height="12" fill="none" stroke="currentColor" strokeWidth="2.5" viewBox="0 0 24 24" className="transition-transform group-hover:translate-x-0.5" aria-hidden="true">
@@ -305,8 +323,8 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
             className="absolute top-32 right-6 sm:right-12 text-right hidden lg:block"
             aria-hidden="true"
           >
-            <div className="font-display font-light text-[#1A1A2A] select-none" style={{ fontSize: 'clamp(80px, 12vw, 160px)' }}>
-              {totalItems}
+            <div className="font-extrabold text-[#1A1A2A] select-none" style={{ fontSize: 'clamp(80px, 12vw, 160px)', letterSpacing: '-0.04em' }}>
+              542
             </div>
             <div className="font-mono text-[9px] text-[#2A2A3A] uppercase tracking-[0.3em]">Props Available</div>
           </motion.div>
@@ -343,16 +361,12 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
         aria-label="Key facts"
       >
         <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
-          {[
-            { to: totalItems, suffix: '', label: 'Props in Stock' },
-            { to: visibleCats.length, suffix: '', label: 'Prop Categories' },
-            { to: 1994, suffix: '', label: 'Year Founded' },
-          ].map(({ to, suffix, label }) => (
+          {STATS.map(({ to, suffix, label, isStatic }) => (
             <div key={label} className="glass rounded-2xl p-5 sm:p-8 flex sm:flex-col items-center sm:items-center justify-between sm:justify-center gap-4 sm:gap-0 min-h-[80px]">
-              <div className="font-display font-light text-[#F0F0F5]" style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}>
-                <Count to={to} suffix={suffix} />
+              <div className="font-extrabold text-[#F0F0F5]" style={{ fontSize: 'clamp(28px, 4vw, 52px)', letterSpacing: '-0.04em' }}>
+                {isStatic ? `${to}${suffix}` : <Count to={to} suffix={suffix} />}
               </div>
-              <div className="font-mono text-[10px] text-[#555568] uppercase tracking-[0.25em] sm:mt-1">{label}</div>
+              <div className="font-medium text-[#555568] uppercase tracking-[0.25em] text-[10px] sm:mt-1">{label}</div>
             </div>
           ))}
         </div>
@@ -369,13 +383,13 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
           className="flex items-end justify-between mb-10"
         >
           <div>
-            <p className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-3">Collections</p>
-            <h2 className="font-display font-light italic text-[#F0F0F5]" style={{ fontSize: 'clamp(32px, 5vw, 60px)' }}>
+            <p className="font-medium text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-3">Collections</p>
+            <h2 className="font-bold text-[#F0F0F5]" style={{ fontSize: 'clamp(32px, 5vw, 60px)', letterSpacing: '-0.025em' }}>
               Browse by Prop Type
             </h2>
           </div>
           <span className="hidden sm:block font-mono text-[10px] text-[#333348] uppercase tracking-[0.25em]">
-            {visibleCats.length} categories · {totalItems}+ pieces
+            {visibleCats.length} categories · 542+ pieces
           </span>
         </motion.div>
 
@@ -422,18 +436,18 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
         <div className="grid sm:grid-cols-2 gap-12 sm:gap-20 items-start">
           {/* Text column */}
           <div>
-            <p className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-4">About the Showroom</p>
+            <p className="font-medium text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-4">About the Showroom</p>
             <h2
               id="about-heading"
-              className="font-display font-light italic text-[#F0F0F5] leading-tight mb-6"
-              style={{ fontSize: 'clamp(28px, 4vw, 48px)' }}
+              className="font-bold text-[#F0F0F5] leading-tight mb-6"
+              style={{ fontSize: 'clamp(28px, 4vw, 48px)', letterSpacing: '-0.025em' }}
             >
               Thirty years of knowing what a set needs.
             </h2>
-            <p className="text-[#7070A0] text-sm sm:text-base leading-relaxed mb-4">
+            <p className="text-[#7070A0] text-sm sm:text-base leading-relaxed mb-4" style={{ lineHeight: 1.65 }}>
               KGN Furniture and Props has been supplying the Mumbai film industry since 1994. Our inventory spans five centuries of furniture styles — from colonial teak and Victorian upholstery to mid-century Scandinavian and contemporary minimalist pieces.
             </p>
-            <p className="text-[#7070A0] text-sm sm:text-base leading-relaxed mb-8">
+            <p className="text-[#7070A0] text-sm sm:text-base leading-relaxed mb-8" style={{ lineHeight: 1.65 }}>
               Every item in our catalogue has been selected with a working set in mind: proportions that read well on camera, finishes that hold under professional lighting, and condition suitable for the rigours of a production schedule. Our Mumbai showroom is open to production designers, art directors, and set decorators by appointment.
             </p>
             {/* Trust callouts */}
@@ -446,7 +460,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
               ].map(t => (
                 <div key={t} className="flex items-start gap-2.5 p-3 rounded-xl bg-[#090910] border border-[#1A1A2A]">
                   <div className="w-1 h-1 rounded-full bg-[#C8902A] mt-1.5 shrink-0" aria-hidden="true" />
-                  <span className="font-mono text-[10px] text-[#7070A0] uppercase tracking-[0.15em] leading-relaxed">{t}</span>
+                  <span className="font-medium text-[10px] text-[#7070A0] uppercase tracking-[0.15em] leading-relaxed">{t}</span>
                 </div>
               ))}
             </div>
@@ -455,19 +469,19 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
           {/* SEO copy column */}
           <div className="space-y-4">
             <div className="h-px bg-[#1A1A2A]" aria-hidden="true" />
-            <p className="font-display font-light italic text-[#3A3A5A] text-lg leading-relaxed">
+            <p className="font-semibold text-[#3A3A5A] text-lg leading-relaxed" style={{ lineHeight: 1.65 }}>
               &ldquo;The working prop house for Indian cinema.&rdquo;
             </p>
             <div className="h-px bg-[#1A1A2A]" aria-hidden="true" />
-            <p className="text-[#555568] text-sm leading-relaxed">
+            <p className="text-[#555568] text-sm leading-relaxed" style={{ lineHeight: 1.65 }}>
               KGN Furniture and Props is a Mumbai-based prop rental house serving the Indian film and television industry since 1994. Our catalogue spans 500+ catalogued pieces across furniture, decorative props, and period pieces — from Victorian and colonial teak to contemporary minimalist and mid-century designs. We work with production designers, art directors, and set decorators across Bollywood features, Netflix and Prime Video originals, and commercial advertising productions. Every piece is available for inspection at our Mumbai showroom.
             </p>
             <div className="pt-4">
               <a
-                href={waBase}
+                href={WHATSAPP_BASE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2.5 font-mono text-[11px] uppercase tracking-[0.2em] text-[#7070A0] hover:text-[#C8902A] transition-colors"
+                className="inline-flex items-center gap-2.5 font-medium text-[11px] uppercase tracking-[0.2em] text-[#7070A0] hover:text-[#C8902A] transition-colors"
               >
                 <WaIcon size={13} />
                 Schedule a showroom visit
@@ -494,15 +508,15 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
         <div className="relative max-w-7xl mx-auto px-6 sm:px-12 py-20">
           <div className="grid sm:grid-cols-2 gap-8 sm:gap-12 items-start">
             <div>
-              <p className="font-mono text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-4">Get In Touch</p>
+              <p className="font-medium text-[10px] text-[#C8902A] uppercase tracking-[0.35em] mb-4">Get In Touch</p>
               <h2
                 id="contact-heading"
-                className="font-display font-light italic text-[#F0F0F5] leading-tight mb-4"
-                style={{ fontSize: 'clamp(28px, 4vw, 52px)' }}
+                className="font-bold text-[#F0F0F5] leading-tight mb-4"
+                style={{ fontSize: 'clamp(28px, 4vw, 52px)', letterSpacing: '-0.025em' }}
               >
                 Looking for something specific?
               </h2>
-              <p className="text-[#7070A0] text-sm leading-relaxed max-w-sm">
+              <p className="text-[#7070A0] text-sm leading-relaxed max-w-sm" style={{ lineHeight: 1.65 }}>
                 Our showroom holds 500+ pieces — but our network goes deeper. If you don&rsquo;t see what your set requires, talk to us. We&rsquo;ve been sourcing for Indian productions since 1994.
               </p>
             </div>
@@ -510,7 +524,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
             <div className="flex flex-col gap-3">
               {/* WhatsApp card */}
               <a
-                href={waBase}
+                href={WHATSAPP_BASE_URL}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="group flex items-center justify-between px-6 py-4 rounded-xl bg-[#25D366]/10 border border-[#25D366]/20 hover:bg-[#25D366]/20 hover:border-[#25D366]/40 transition-all focus-visible:outline focus-visible:outline-2 focus-visible:outline-[#25D366] focus-visible:outline-offset-2"
@@ -518,7 +532,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
                 <div className="flex items-center gap-3">
                   <span className="text-[#25D366]"><WaIcon size={18} /></span>
                   <div>
-                    <div className="font-mono text-xs text-[#25D366] font-medium">WhatsApp the Showroom</div>
+                    <div className="font-semibold text-xs text-[#25D366]">WhatsApp the Showroom</div>
                     <div className="font-mono text-[10px] text-[#555568] mt-0.5">Usually replies within the hour · Visit by appointment</div>
                   </div>
                 </div>
@@ -540,7 +554,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
                     </svg>
                   </div>
                   <div>
-                    <div className="font-mono text-xs text-[#D0D0E0] font-medium">Build Your Shortlist</div>
+                    <div className="font-semibold text-xs text-[#D0D0E0]">Build Your Shortlist</div>
                     <div className="font-mono text-[10px] text-[#555568] mt-0.5">Select multiple pieces · We confirm availability</div>
                   </div>
                 </div>
@@ -554,7 +568,7 @@ export default function HomeClient({ categories, totalItems }: { categories: Cat
 
           {/* Footer */}
           <div className="mt-16 pt-6 border-t border-[#0E0E1A]">
-            <p className="font-display font-light italic text-[#2A2A4A] text-sm mb-4">
+            <p className="font-semibold text-[#2A2A4A] text-sm mb-4">
               The working prop house for Indian cinema.
             </p>
             <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 text-[10px] font-mono text-[#2A2A4A] uppercase tracking-[0.2em]">

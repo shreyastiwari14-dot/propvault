@@ -11,9 +11,7 @@
   --color-text-muted: #3A3A5A;
   --color-accent: #C8902A;
   --color-accent-glow: rgba(200,144,42,0.20);
-  --font-sans: var(--font-dm-sans, "DM Sans"), sans-serif;
-  --font-mono: var(--font-ibm-plex-mono, "IBM Plex Mono"), monospace;
-  --font-display: var(--font-cormorant, "Cormorant Garamond"), Georgia, serif;
+  --font-sans: var(--font-inter, "Inter"), system-ui, sans-serif;
 }
 
 *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
@@ -33,19 +31,21 @@ body {
   overflow-x: hidden;
 }
 
+h1, h2, h3, h4 {
+  font-weight: 700;
+  letter-spacing: -0.025em;
+  font-style: normal;
+  line-height: 1.1;
+}
+
 ::selection { background: #C8902A; color: #020206; }
 :focus-visible { outline: 2px solid #C8902A; outline-offset: 3px; }
+:focus:not(:focus-visible) { outline: none; }
 
 ::-webkit-scrollbar { width: 4px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #1A1A2A; border-radius: 9999px; }
 ::-webkit-scrollbar-thumb:hover { background: #2A2A3A; }
-
-/* ── Display font utility ── */
-.font-display {
-  font-family: var(--font-display);
-  font-feature-settings: "onum" 1, "kern" 1;
-}
 
 /* ── Glass morphism ── */
 .glass {
@@ -144,7 +144,7 @@ body {
   border-radius: 12px;
   padding: 12px 16px;
   color: #F0F0F5;
-  font-family: var(--font-mono);
+  font-family: var(--font-sans);
   font-size: 13px;
   outline: none;
   transition: border-color 0.2s;

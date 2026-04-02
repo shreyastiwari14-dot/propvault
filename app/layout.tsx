@@ -1,33 +1,19 @@
 import type { Metadata } from 'next'
-import { DM_Sans, IBM_Plex_Mono, Cormorant_Garamond } from 'next/font/google'
+import { Inter } from 'next/font/google'
 import './globals.css'
 import { CartProvider } from '@/components/CartContext'
 import CartDrawer from '@/components/CartDrawer'
 import CartFab from '@/components/CartFab'
 
-const dmSans = DM_Sans({
+const inter = Inter({
   subsets: ['latin'],
-  variable: '--font-dm-sans',
+  variable: '--font-inter',
   display: 'swap',
-})
-
-const ibmPlexMono = IBM_Plex_Mono({
-  subsets: ['latin'],
-  weight: ['400', '500', '600'],
-  variable: '--font-ibm-plex-mono',
-  display: 'swap',
-})
-
-const cormorant = Cormorant_Garamond({
-  subsets: ['latin'],
-  weight: ['300', '400', '500', '600', '700'],
-  style: ['normal', 'italic'],
-  variable: '--font-cormorant',
-  display: 'swap',
+  weight: ['400', '500', '600', '700', '800'],
 })
 
 export const metadata: Metadata = {
-  title: 'Prop Rental for Film & OTT Production | KGN Furniture and Props — Mumbai',
+  title: 'Prop Rental Mumbai | Film & OTT Props | KGN Furniture and Props',
   description: 'Furniture and prop rental for Bollywood, Netflix, and commercial shoots. 500+ catalogued pieces in Mumbai. Inspect before you book. Est. 1994.',
 }
 
@@ -38,13 +24,30 @@ const jsonLd = {
   description:
     'Prop rental for Bollywood, OTT, and commercial film productions. Furniture and period pieces for set design. Mumbai showroom, established 1994.',
   url: 'https://propvault-six.vercel.app',
+  // TODO: Replace with actual telephone, street address, GPS coordinates
   address: {
     '@type': 'PostalAddress',
+    streetAddress: '', // TODO: add actual street address
     addressLocality: 'Mumbai',
     addressRegion: 'Maharashtra',
+    postalCode: '', // TODO: add actual postal code
     addressCountry: 'IN',
   },
+  geo: {
+    '@type': 'GeoCoordinates',
+    latitude: '', // TODO: add actual GPS latitude
+    longitude: '', // TODO: add actual GPS longitude
+  },
   foundingDate: '1994',
+  numberOfEmployees: {
+    '@type': 'QuantitativeValue',
+    value: 5,
+  },
+  hasOfferCatalog: {
+    '@type': 'OfferCatalog',
+    name: 'Prop & Furniture Rental Catalogue',
+    description: '500+ catalogued furniture and prop pieces available for film, OTT, and commercial productions.',
+  },
   keywords:
     'prop rental Mumbai, film props Mumbai, Bollywood prop rental, OTT production props, set decoration props, furniture rental film shoots',
   priceRange: '₹₹',
@@ -62,7 +65,7 @@ const jsonLd = {
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${dmSans.variable} ${ibmPlexMono.variable} ${cormorant.variable}`}>
+    <html lang="en" className={inter.variable}>
       <head>
         <script
           type="application/ld+json"

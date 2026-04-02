@@ -126,11 +126,21 @@ export default async function ItemPage({ params }: Props) {
                   {item.status.charAt(0).toUpperCase() + item.status.slice(1)}
                 </div>
               </div>
-              <h1 className="font-display text-[clamp(28px,4vw,48px)] font-light text-[#F0F0F5] leading-tight">
+              <h1 className="font-bold text-[#F0F0F5] leading-tight" style={{ fontSize: 'clamp(28px,4vw,48px)', letterSpacing: '-0.02em' }}>
                 {item.name}
               </h1>
               {item.description && (
-                <p className="mt-3 text-[#7070A0] text-sm leading-relaxed">{item.description}</p>
+                <p className="mt-3 text-[#7070A0] text-sm leading-relaxed" style={{ lineHeight: 1.65 }}>{item.description}</p>
+              )}
+              {/* Style / use-case tags */}
+              {(item.style || item.configuration) && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  {[item.style, item.configuration].filter(Boolean).map((tag) => (
+                    <span key={tag} className="font-medium text-[10px] uppercase tracking-[0.12em] text-[#C8902A] bg-[#C8902A]/10 border border-[#C8902A]/20 px-3 py-1 rounded-full">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
               )}
             </div>
 
