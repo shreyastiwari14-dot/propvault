@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Outfit, JetBrains_Mono } from "next/font/google";
+import { Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Navigation from "@/components/layout/Navigation";
 import { PropListProvider } from "@/components/PropListContext";
@@ -7,7 +7,7 @@ import PropListDrawer from "@/components/PropListDrawer";
 import PropListFab from "@/components/PropListFab";
 import SmoothScroll from "@/components/SmoothScroll";
 
-const outfit = Outfit({
+const inter = Inter({
   subsets: ["latin"],
   variable: "--font-sans",
   display: "swap",
@@ -41,7 +41,7 @@ export default function RootLayout({
   return (
     <html
       lang="en"
-      className={`${outfit.variable} ${jetbrainsMono.variable}`}
+      className={`${inter.variable} ${jetbrainsMono.variable}`}
     >
       <head>
         <script

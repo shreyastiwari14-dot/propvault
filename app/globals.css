@@ -1,20 +1,5 @@
 @import "tailwindcss";
 
-/* Druk Condensed — local font */
-@font-face {
-  font-family: "Druk";
-  src: url("/fonts/DrukCond-Super-Trial.otf") format("opentype");
-  font-weight: 900;
-  font-style: normal;
-  font-display: swap;
-}
-@font-face {
-  font-family: "Druk";
-  src: url("/fonts/DrukCond-SuperItalic-Trial.otf") format("opentype");
-  font-weight: 900;
-  font-style: italic;
-  font-display: swap;
-}
 
 /* ══════════════════════════════════════════
    KGN PROPS — V3 Design System
@@ -36,8 +21,8 @@
   --color-accent-hover: #00f0cc;
   --color-warm: #f06830;
   --color-warm-glow: rgba(240, 104, 48, 0.1);
-  --font-sans: "Outfit", ui-sans-serif, system-ui, sans-serif;
-  --font-display: "Druk", ui-sans-serif, system-ui, sans-serif;
+  --font-sans: "Inter", ui-sans-serif, system-ui, sans-serif;
+  --font-display: -apple-system, BlinkMacSystemFont, "SF Pro Display", "Inter", ui-sans-serif, sans-serif;
   --font-mono: "JetBrains Mono", ui-monospace, monospace;
 }
 
